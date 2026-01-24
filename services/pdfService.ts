@@ -53,14 +53,17 @@ export const generatePDF = async (
     }
 
     // --- Header Function ---
-    const addHeader = () => {
+    const addHeader = (isFirstPage: boolean = false) => {
         const headerY = 10;
-        const logoHeight = 12;
+        const targetSize = 25; // Matching QR Code Size approx
 
-        // 1. Logo
+        // 1. Logo (Left) - Force size to match QR Code area roughly
         if (logoResult) {
-            const logoWidth = logoHeight * (logoResult.width / logoResult.height);
-            doc.addImage(logoResult.data, 'PNG', margin, headerY, logoWidth, logoHeight);
+            // Keep aspect ratio but fit within box
+            const ratio = logoResult.width / logoResult.height;
+            const w = ratio >= 1 ? targetSize : targetSize * ratio;
+            const h = ratio < 1 ? targetSize : targetSize / ratio;
+            doc.addImage(logoResult.data, 'PNG', margin, headerY, w, h);
         } else {
             doc.setTextColor(COLORS.primary);
             doc.setFontSize(14);
@@ -68,20 +71,56 @@ export const generatePDF = async (
             doc.text("DC ENERGY", margin, headerY + 8);
         }
 
-        // 2. Title
-        doc.setTextColor(COLORS.text);
-        doc.setFontSize(22);
-        doc.setFont("helvetica", "normal");
-        const title = "Cnercell LFP series";
-        doc.text(title, margin + 40, headerY + 8);
+        // 2. Title - "Cnercell [LFP/NMC] series"
+        // Style: "Cnercell" (Dark Grey/Black), "LFP series" (Green)
+        // Font: Bold, Large
+        const titleX = margin + 40;
+        const titleY = headerY + 12;
+
+        doc.setFontSize(24);
+        doc.setFont("helvetica", "bold");
+
+        // "Cnercell"
+        doc.setTextColor("#41463F"); // Dark Grey
+        doc.text("Cnercell", titleX, titleY);
+
+        // "LFP series" or "NMC series"
+        const seriesText = ` ${specs.chemistry} series`;
+        const cnercellWidth = doc.getTextWidth("Cnercell");
+
+        doc.setTextColor(COLORS.primary); // Green
+        doc.text(seriesText, titleX + cnercellWidth, titleY);
+
+        // 3. QR Code (Left on subsequent pages? No, usually Right top on Page 1)
+        if (isFirstPage && qrCodeDataUrl) {
+            doc.addImage(qrCodeDataUrl, 'PNG', pageWidth - margin - targetSize, headerY, targetSize, targetSize);
+        }
 
         // Line
-        const lineY = headerY + logoHeight + 5;
+        const lineY = headerY + targetSize + 5;
         doc.setDrawColor(COLORS.secondary);
         doc.setLineWidth(0.5);
         doc.line(margin, lineY, pageWidth - margin, lineY);
 
         return lineY;
+    };
+
+    // --- Footer Function ---
+    const addFooter = (pageNumber: number) => {
+        const footerY = pageHeight - 10;
+
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(COLORS.text); // Greyish text
+
+        // Website (Left)
+        doc.text("www.cnergy.co.in", margin, footerY);
+
+        // Page Number (Center)
+        doc.text(`Page ${pageNumber}`, pageWidth / 2, footerY, { align: 'center' });
+
+        // Email (Right)
+        doc.text("info@cnergy.co.in", pageWidth - margin, footerY, { align: 'right' });
     };
 
     // --- Style Helpers ---
@@ -114,7 +153,7 @@ export const generatePDF = async (
     };
 
     // ================= PAGE 1 =================
-    let yPos = addHeader();
+    let yPos = addHeader(true);
     yPos += 15;
 
     // 1. PRODUCT OVERVIEW
@@ -160,20 +199,17 @@ export const generatePDF = async (
     doc.setTextColor(COLORS.accent);
     doc.text(`* Life at 25°C, 0.5C charge/discharge\n** Terms and Conditions apply`, margin, finalY);
 
-    // QR Code (Top Right Page 1)
-    if (qrCodeDataUrl) {
-        doc.addImage(qrCodeDataUrl, 'PNG', pageWidth - margin - 20, 5, 20, 20);
-    }
-
-    // Footer Link P1
-    doc.setFont("helvetica", "normal");
-    doc.text("www.cnergy.co.in", margin, pageHeight - 10);
-    doc.text("info@cnergy.co.in", pageWidth - margin - 30, pageHeight - 10);
+    // Standard Footer
+    addFooter(1);
 
 
     // ================= PAGE 2: Graphics & Summary =================
     doc.addPage();
-    yPos = 15;
+    // No full header on P2/P3 typically in reports, but if requested we can add. 
+    // Usually subsequent pages just have content or minimal header. 
+    // Let's add the standard header everywhere for consistency as per "heading style" request.
+    yPos = addHeader(false);
+    yPos += 15;
 
     // 2. PERFORMANCE GRAPHICS
     doc.setFontSize(16);
@@ -234,15 +270,13 @@ export const generatePDF = async (
         });
     }
 
-    // Footer Link P2
-    doc.setFontSize(8);
-    doc.setTextColor(COLORS.accent);
-    doc.text("www.cnergy.co.in", margin, pageHeight - 10);
+    addFooter(2);
 
 
     // ================= PAGE 3: Features & Protection =================
     doc.addPage();
-    yPos = 15;
+    yPos = addHeader(false);
+    yPos += 15;
 
     // 4. NOTABLE FEATURES
     doc.setFontSize(16);
@@ -335,25 +369,26 @@ export const generatePDF = async (
     doc.text(customText, margin, yPos);
 
 
-    // Final Footer with Stamp and Warranty
-    const footerY = pageHeight - 40;
-
+    // Final Warranty (Above Footer)
+    const warrantyY = pageHeight - 22; // Just above footer
     doc.setFontSize(10);
     doc.setTextColor(COLORS.primary);
     doc.setFont("helvetica", "bold");
-    doc.text("Warranty Statement:", margin, footerY);
+    doc.text("Warranty Statement:", margin, warrantyY);
+
+    if (stampResult) {
+        const stampSize = 25;
+        doc.addImage(stampResult.data, 'PNG', pageWidth - margin - stampSize - 10, warrantyY - 10, stampSize, stampSize);
+    } else {
+        doc.text("[Authorized QC Stamp]", pageWidth - margin - 50, warrantyY);
+    }
 
     doc.setFontSize(9);
     doc.setTextColor(COLORS.text);
     doc.setFont("helvetica", "normal");
-    doc.text(`${specs.warrantyPeriod} standard limited warranty applies to this product.\nSee full terms at www.cnergy.co.in`, margin, footerY + 6);
+    doc.text(`${specs.warrantyPeriod} standard limited warranty applies to this product.\nSee full terms at www.cnergy.co.in`, margin + 37, warrantyY);
 
-    if (stampResult) {
-        const stampSize = 30;
-        doc.addImage(stampResult.data, 'PNG', pageWidth - margin - stampSize - 10, footerY - 5, stampSize, stampSize);
-    } else {
-        doc.text("[Authorized QC Stamp]", pageWidth - margin - 50, footerY + 10);
-    }
+    addFooter(3);
 
     doc.save(`${data.fileName || 'Battery_Report'}.pdf`);
 };
