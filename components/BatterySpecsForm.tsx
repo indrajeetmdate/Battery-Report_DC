@@ -160,13 +160,14 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Rated Capacity (Ah)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Rated Capacity (Ah) <span className="text-xs text-gray-400 font-normal">(Auto-calculated)</span></label>
           <input
             type="number"
             name="ratedCapacity"
             value={specs.ratedCapacity}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E]"
+            readOnly
+            disabled
+            className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-500 rounded-md cursor-not-allowed"
           />
         </div>
 
