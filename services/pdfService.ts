@@ -365,23 +365,25 @@ export const generatePDF = async (
 
 
     // Final Warranty (Above Footer)
-    const warrantyY = pageHeight - 22; // Just above footer
+    const warrantyY = pageHeight - 35; // Moved up to clear footer area significantly
     doc.setFontSize(10);
     doc.setTextColor(COLORS.primary);
     doc.setFont("helvetica", "bold");
     doc.text("Warranty Statement:", margin, warrantyY);
 
-    if (stampResult) {
-        const stampSize = 25;
-        doc.addImage(stampResult.data, 'PNG', pageWidth - margin - stampSize - 10, warrantyY - 10, stampSize, stampSize);
-    } else {
-        doc.text("[Authorized QC Stamp]", pageWidth - margin - 50, warrantyY);
-    }
-
     doc.setFontSize(9);
     doc.setTextColor(COLORS.text);
     doc.setFont("helvetica", "normal");
     doc.text(`${specs.warrantyPeriod} standard limited warranty applies to this product.\nSee full terms at www.cnergy.co.in`, margin + 37, warrantyY);
+
+    // Stamp - Positioned nicely with warranty text, clearly above footer
+    if (stampResult) {
+        const stampSize = 25;
+        // Position right aligned, vertically centered with text block roughly
+        doc.addImage(stampResult.data, 'PNG', pageWidth - margin - stampSize - 10, warrantyY - 5, stampSize, stampSize);
+    } else {
+        doc.text("[Authorized QC Stamp]", pageWidth - margin - 50, warrantyY);
+    }
 
     addFooter(3);
 
