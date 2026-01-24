@@ -144,9 +144,9 @@ export const generatePDF = async (
             lineWidth: 0.1
         },
         columnStyles: {
-            // Column 0: Light Green Background
-            0: { width: 80, fillColor: [237, 247, 224] },
-            // Column 1: White Background (Explicitly set to override any alternates)
+            // Column 0: Light Green Background, Bold Text
+            0: { width: 80, fillColor: [237, 247, 224], fontStyle: 'bold' },
+            // Column 1: White Background
             1: { fillColor: [255, 255, 255] }
         },
         margin: { left: margin, right: margin }
@@ -254,9 +254,28 @@ export const generatePDF = async (
         yPos += 6;
 
         const excludedTerms = ['capacity attenuation', 'charge and discharge efficiency', 'device id', 'cycle number'];
+
+        const formatTime = (val: string | number) => {
+            if (typeof val !== 'string') return val;
+            // Expected format HH:MM:SS or similar
+            const parts = val.split(':');
+            if (parts.length >= 2) {
+                const h = parseInt(parts[0], 10);
+                const m = parseInt(parts[1], 10);
+                return `${h} Hour ${m} Min`;
+            }
+            return val;
+        };
+
         const loopBody = data.loopSummary
             .filter(l => !excludedTerms.some(term => l.metric.toLowerCase().includes(term)))
-            .map(l => [l.metric, l.value]);
+            .map(l => {
+                let val = l.value;
+                if (l.metric.toLowerCase().includes('time')) {
+                    val = formatTime(val);
+                }
+                return [l.metric, val];
+            });
 
         autoTable(doc, {
             startY: yPos,
