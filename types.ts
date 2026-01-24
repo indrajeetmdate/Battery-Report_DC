@@ -10,6 +10,7 @@ export interface BatterySpecs {
   cellType: string;
   series: number;
   parallel: number;
+  applications: string[];
 }
 
 export interface DataPoint {

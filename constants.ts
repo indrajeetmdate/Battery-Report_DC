@@ -22,5 +22,6 @@ export const DEFAULT_SPECS: BatterySpecs = {
   warrantyPeriod: '3 Years',
   cellType: '32700',
   series: 4,
-  parallel: 1
+  parallel: 1,
+  applications: []
 };

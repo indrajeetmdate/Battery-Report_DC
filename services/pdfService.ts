@@ -133,7 +133,7 @@ export const generatePDF = async (
         ["Battery Chemistry", specs.chemistry],
         ["Cells", specs.cellType || "32700"],
         ["Nominal Voltage", `${specs.nominalVoltage} V`],
-        ["Application", "2W EV / 3W EV / Solar Street Light"],
+        ["Application", (specs.applications && specs.applications.length > 0) ? specs.applications.join(' / ') : "Custom"],
         ["Configuration", `${specs.series}S ${specs.parallel}P`],
         ["Nominal Capacity", `${specs.ratedCapacity} Ah`],
         ["Usable Energy", `${energy} Wh`],
@@ -251,10 +251,14 @@ export const generatePDF = async (
     doc.text("4. Notable Features", margin, yPos);
     yPos += 8;
 
+    const chemistryFeature = specs.chemistry === 'LFP'
+        ? "Ultra safe Lithium Iron Phosphate chemistry (no thermal run-away)"
+        : "High Energy Density Nickel Manganese Cobalt (NMC) chemistry";
+
     const features = [
-        "High lifespan: > 2000 cycles",
+        `High lifespan: > ${specs.ratedLifeCycle} cycles`,
         "Deep discharge allowed up to 100%",
-        "Ultra safe Lithium Iron Phosphate chemistry (no thermal run-away)",
+        chemistryFeature,
         "Embedded BMS (Battery Management System)",
         "No Lead, no rare earths, no acid, no degassing",
         "Excellent temperature robustness (-20 °C up to +60 °C)",
