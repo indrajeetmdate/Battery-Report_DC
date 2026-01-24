@@ -205,11 +205,7 @@ export const generatePDF = async (
 
     // ================= PAGE 2: Graphics & Summary =================
     doc.addPage();
-    // No full header on P2/P3 typically in reports, but if requested we can add. 
-    // Usually subsequent pages just have content or minimal header. 
-    // Let's add the standard header everywhere for consistency as per "heading style" request.
-    yPos = addHeader(false);
-    yPos += 15;
+    yPos = 20; // Simple top margin for subsequent pages
 
     // 2. PERFORMANCE GRAPHICS
     doc.setFontSize(16);
@@ -275,8 +271,7 @@ export const generatePDF = async (
 
     // ================= PAGE 3: Features & Protection =================
     doc.addPage();
-    yPos = addHeader(false);
-    yPos += 15;
+    yPos = 20;
 
     // 4. NOTABLE FEATURES
     doc.setFontSize(16);
