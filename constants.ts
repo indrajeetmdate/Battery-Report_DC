@@ -28,3 +28,16 @@ export const DEFAULT_SPECS: BatterySpecs = {
   dimensions: '(L) x (W) x (H) mm',
   weight: 'numeric entry kg'
 };
+
+export const CELL_SPECS: Record<string, { capacity: number, weight: number }> = {
+  '21700': { capacity: 4.5, weight: 0.07 },
+  '32140': { capacity: 15, weight: 0.305 },
+  '32700': { capacity: 6, weight: 0.145 },
+  '18650': { capacity: 2.6, weight: 0.048 },
+  '26650': { capacity: 5, weight: 0.1 },
+  '628Ah': { capacity: 628, weight: 11.5 },
+  '50Ah': { capacity: 50, weight: 1.5 },
+  '100Ah': { capacity: 100, weight: 2.3 },
+  '105Ah': { capacity: 105, weight: 2.04 },
+  '230Ah': { capacity: 230, weight: 4.264 }
+};

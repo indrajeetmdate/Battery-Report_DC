@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { BatterySpecs } from '../types';
+import { CELL_SPECS } from '../constants';
 
 interface BatterySpecsFormProps {
   specs: BatterySpecs;
@@ -21,27 +22,69 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
       [name]: newValue
     };
 
-    // Automate Warranty and Life Cycle and Nominal Voltage based on Chemistry/Series
-    if (name === 'chemistry' || name === 'series') {
-      const chemistry = name === 'chemistry' ? newValue : specs.chemistry;
-      const series = name === 'series' ? newValue : specs.series;
+    updateDependentFields(updatedSpecs, name, newValue);
+  };
 
-      // Voltage
-      const cellVoltage = chemistry === 'LFP' ? 3.2 : 3.7;
-      updatedSpecs.nominalVoltage = Number((cellVoltage * series).toFixed(1));
+  const handleAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    let currentApps = specs.applications || [];
 
-      // Life Cycle & Warranty
-      if (chemistry === 'LFP') {
-        updatedSpecs.ratedLifeCycle = 2000;
-        updatedSpecs.warrantyPeriod = '3 Years';
-      } else {
-        updatedSpecs.ratedLifeCycle = 1000;
-        updatedSpecs.warrantyPeriod = '2 Years';
-      }
+    if (checked) {
+      if (!currentApps.includes(value)) currentApps = [...currentApps, value];
+    } else {
+      currentApps = currentApps.filter(app => app !== value);
     }
 
+    const updatedSpecs = {
+      ...specs,
+      applications: currentApps
+    };
     onChange(updatedSpecs);
   };
+
+  const updateDependentFields = (currentSpecs: BatterySpecs, changedField: string, newValue: any) => {
+    // Automate Warranty, Life Cycle, Voltage, Capacity, Weight
+    const triggers = ['chemistry', 'series', 'parallel', 'cellType'];
+
+    if (triggers.includes(changedField)) {
+      const chemistry = currentSpecs.chemistry;
+      const series = Number(currentSpecs.series) || 0;
+      const parallel = Number(currentSpecs.parallel) || 0;
+      const cellType = currentSpecs.cellType;
+
+      // 1. Voltage Calculation
+      const cellVoltage = chemistry === 'LFP' ? 3.2 : 3.7;
+      currentSpecs.nominalVoltage = Number((cellVoltage * series).toFixed(1));
+
+      // 2. Capacity and Weight Calculation (from CELL_SPECS)
+      const cellSpec = CELL_SPECS[cellType];
+      if (cellSpec) {
+        // Capacity = Cell Capacity * Parallel
+        currentSpecs.ratedCapacity = Number((cellSpec.capacity * parallel).toFixed(1));
+
+        // Weight = Cell Weight * Total Cells (S * P)
+        // We format it as a string "XX.X kg"
+        const totalWeight = cellSpec.weight * series * parallel;
+        currentSpecs.weight = `${totalWeight.toFixed(2)} kg`;
+      }
+
+      // 3. Life Cycle & Warranty Logic
+      // Rule: If 100Ah or 230Ah -> 3000 cycles
+      if (cellType === '100Ah' || cellType === '230Ah') {
+        currentSpecs.ratedLifeCycle = 3000;
+        currentSpecs.warrantyPeriod = '5 Years';
+      } else if (chemistry === 'LFP') {
+        currentSpecs.ratedLifeCycle = 2000;
+        currentSpecs.warrantyPeriod = '3 Years';
+      } else {
+        currentSpecs.ratedLifeCycle = 1000;
+        currentSpecs.warrantyPeriod = '2 Years';
+      }
+    }
+    onChange(currentSpecs);
+  };
+
+  const APP_OPTIONS = ["2W EV", "3W EV", "Solar Street Light", "UPS", "Inverter", "ESS"];
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
@@ -73,12 +116,9 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E] bg-white"
           >
-            <option value="32140">32140</option>
-            <option value="32700">32700</option>
-            <option value="21700">21700</option>
-            <option value="18650">18650</option>
-            <option value="100Ah">100 Ah</option>
-            <option value="230Ah">230 Ah</option>
+            {Object.keys(CELL_SPECS).map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
           </select>
         </div>
 
