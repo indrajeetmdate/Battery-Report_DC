@@ -11,6 +11,9 @@ export interface BatterySpecs {
   series: number;
   parallel: number;
   applications: string[];
+  terminalType: string;
+  dimensions: string;
+  weight: string;
 }
 
 export interface DataPoint {

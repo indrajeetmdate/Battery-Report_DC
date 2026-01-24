@@ -23,5 +23,8 @@ export const DEFAULT_SPECS: BatterySpecs = {
   cellType: '32700',
   series: 4,
   parallel: 1,
-  applications: []
+  applications: [],
+  terminalType: 'Spot Welded Nickel / M6 Bolted',
+  dimensions: '(L) x (W) x (H) mm',
+  weight: 'numeric entry kg'
 };

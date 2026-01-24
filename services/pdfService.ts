@@ -178,9 +178,9 @@ export const generatePDF = async (
         ["Usable Energy", `${energy} Wh`],
         ["Maximum Continuous\nDischarge (Charge) Current", "1C (0.5C)"],
         ["Charging", "CC-CV"],
-        ["Terminal Type", "Spot Welded Nickel / M6 Bolted"],
-        ["Dimensions", "(L) x (W) x (H) mm"],
-        ["Weight", "numeric entry kg"],
+        ["Terminal Type", specs.terminalType || "Spot Welded Nickel / M6 Bolted"],
+        ["Dimensions", specs.dimensions || "(L) x (W) x (H) mm"],
+        ["Weight", specs.weight || "numeric entry kg"],
         ["Cycle Life (80% DOD)", `${specs.ratedLifeCycle} Cycles`],
         ["Warranty Period", specs.warrantyPeriod + " *"],
     ];
