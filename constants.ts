@@ -19,5 +19,8 @@ export const DEFAULT_SPECS: BatterySpecs = {
   ratedCapacity: 100,
   ratedLifeCycle: 2000,
   bms: 'Yes passive',
-  warrantyPeriod: '3 Years'
+  warrantyPeriod: '3 Years',
+  cellType: '32700',
+  series: 4,
+  parallel: 1
 };

@@ -6,6 +6,10 @@ export interface BatterySpecs {
   ratedLifeCycle: number;
   bms: 'Yes active' | 'Yes passive' | 'No';
   warrantyPeriod: string;
+  // New fields
+  cellType: string;
+  series: number;
+  parallel: number;
 }
 
 export interface DataPoint {
