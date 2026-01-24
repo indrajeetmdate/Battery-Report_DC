@@ -1,0 +1,5 @@
+{
+  "name": "DC Energy Battery Report",
+  "description": "Professional battery test report generator with Excel data processing, visualization, and PDF export.",
+  "requestFramePermissions": []
+}
