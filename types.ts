@@ -14,6 +14,10 @@ export interface BatterySpecs {
   terminalType: string;
   dimensions: string;
   weight: string;
+  // Dimensions Breakdown
+  length?: number;
+  width?: number;
+  height?: number;
 }
 
 export interface DataPoint {

@@ -167,10 +167,23 @@ export const generatePDF = async (
     doc.text(data.fileName, margin + 55, yPos);
     yPos += 10;
 
+    const prismaticTypes = ['50Ah', '100Ah', '105Ah', '230Ah', '628Ah'];
+    const cylindricalTypes = ['18650', '21700', '26650', '32700', '32140'];
+    let terminalType = specs.terminalType || "Spot Welded Nickel / M6 Bolted";
+    if (specs.cellType) {
+        if (prismaticTypes.includes(specs.cellType)) terminalType = "M6 Bolted";
+        else if (cylindricalTypes.includes(specs.cellType)) terminalType = "Spot Welded Nickel";
+    }
+
+    let dimensionsStr = specs.dimensions || "(L) x (W) x (H) mm";
+    if (specs.length && specs.width && specs.height) {
+        dimensionsStr = `${specs.length} (L) x ${specs.width} (W) x ${specs.height} (H) mm`;
+    }
+
     const energy = (specs.nominalVoltage * specs.ratedCapacity).toFixed(0);
     const specData = [
         ["Battery Chemistry", specs.chemistry],
-        ["Cells", specs.cellType || "32700"],
+        ["Cells", specs.cellType || "32700/100Ah"],
         ["Nominal Voltage", `${specs.nominalVoltage} V`],
         ["Application", (specs.applications && specs.applications.length > 0) ? specs.applications.join(' / ') : "Custom"],
         ["Configuration", `${specs.series}S ${specs.parallel}P`],
@@ -178,8 +191,8 @@ export const generatePDF = async (
         ["Usable Energy", `${energy} Wh`],
         ["Maximum Continuous\nDischarge (Charge) Current", "1C (0.5C)"],
         ["Charging", "CC-CV"],
-        ["Terminal Type", specs.terminalType || "Spot Welded Nickel / M6 Bolted"],
-        ["Dimensions", specs.dimensions || "(L) x (W) x (H) mm"],
+        ["Terminal Type", terminalType],
+        ["Dimensions", dimensionsStr],
         ["Weight", specs.weight || "numeric entry kg"],
         ["Cycle Life (80% DOD)", `${specs.ratedLifeCycle} Cycles`],
         ["Warranty Period", specs.warrantyPeriod + " *"],
@@ -271,10 +284,24 @@ export const generatePDF = async (
             .filter(l => !excludedTerms.some(term => l.metric.toLowerCase().includes(term)))
             .map(l => {
                 let val = l.value;
-                if (l.metric.toLowerCase().includes('time')) {
+                let metric = l.metric;
+
+                // Energy Unit Conversion (kWh -> Wh)
+                if (metric.toLowerCase().includes('charging energy') || metric.toLowerCase().includes('discharging energy')) {
+                    const numVal = parseFloat(String(val));
+                    if (!isNaN(numVal)) {
+                        // Check if it's likely kWh (small number < 100 for typical modules, or just based on instruction)
+                        // Prompt says: "values and heading... in Wh not in KWh". Assuming input is kWh.
+                        val = (numVal * 1000).toFixed(2) + " Wh";
+                    }
+                    // Update Heading/Metric Name
+                    metric = metric.replace(/\(kWh\)/i, '(Wh)').replace(/kWh/i, 'Wh');
+                }
+
+                if (metric.toLowerCase().includes('time')) {
                     val = formatTime(val);
                 }
-                return [l.metric, val];
+                return [metric, val];
             });
 
         autoTable(doc, {

@@ -147,6 +147,37 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
           </div>
         </div>
 
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Dimensions (mm)</label>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              name="length"
+              placeholder="L"
+              value={specs.length || ''}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E]"
+            />
+            <input
+              type="number"
+              name="width"
+              placeholder="W"
+              value={specs.width || ''}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E]"
+            />
+            <input
+              type="number"
+              name="height"
+              placeholder="H"
+              value={specs.height || ''}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E]"
+            />
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Nominal Voltage (V) <span className="text-xs text-gray-400 font-normal">(Auto-calculated)</span></label>
           <input
