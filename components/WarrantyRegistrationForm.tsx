@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { registerWarranty, WarrantyRegistration } from '../services/supabaseService';
-import { Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Shield, CheckCircle, AlertCircle, Loader2, FileText, ExternalLink } from 'lucide-react';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error' | 'duplicate';
 
@@ -19,6 +19,7 @@ export const WarrantyRegistrationForm: React.FC = () => {
   });
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [pdfReportLink, setPdfReportLink] = useState<{ url: string; name: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -32,6 +33,19 @@ export const WarrantyRegistrationForm: React.FC = () => {
     try {
       await registerWarranty(formData);
       setFormState('success');
+
+      // After successful registration, check for an existing PDF report in Google Drive
+      try {
+        const response = await fetch(`/api/check-pdf?serialNumber=${encodeURIComponent(formData.serial_number)}`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.exists) {
+            setPdfReportLink({ url: result.webViewLink, name: result.name });
+          }
+        }
+      } catch (pdfErr) {
+        console.warn('Failed to check for PDF report:', pdfErr);
+      }
     } catch (err: any) {
       if (err.message === 'ALREADY_REGISTERED') {
         setFormState('duplicate');
@@ -46,6 +60,7 @@ export const WarrantyRegistrationForm: React.FC = () => {
     setFormData({ serial_number: '', customer_name: '', phone_number: '', email: '', invoice_number: '' });
     setFormState('idle');
     setErrorMessage('');
+    setPdfReportLink(null);
   };
 
   if (formState === 'success') {
@@ -61,6 +76,24 @@ export const WarrantyRegistrationForm: React.FC = () => {
         <p className="text-sm text-gray-400 mb-8">
           Serial: <span className="font-medium text-[#41463F]">{formData.serial_number}</span>
         </p>
+
+        {pdfReportLink && (
+          <div className="bg-[#78AD3E]/10 border border-[#78AD3E]/20 rounded-2xl p-6 mb-8 max-w-sm w-full animate-bounceIn">
+            <div className="flex items-center gap-3 mb-3 justify-center">
+              <FileText className="w-5 h-5 text-[#78AD3E]" />
+              <h3 className="font-bold text-[#41463F]">Test Report Found!</h3>
+            </div>
+            <p className="text-xs text-gray-500 mb-4">An official test report for this product is available.</p>
+            <a
+              href={pdfReportLink.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-[#78AD3E] text-[#78AD3E] font-bold rounded-xl hover:bg-[#78AD3E] hover:text-white transition-all shadow-sm"
+            >
+              <ExternalLink className="w-4 h-4" /> View PDF Report
+            </a>
+          </div>
+        )}
         <button
           onClick={handleReset}
           className="px-6 py-2.5 rounded-xl bg-[#78AD3E] text-white font-semibold hover:bg-[#6a9836] transition-colors"

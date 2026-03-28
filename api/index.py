@@ -11,6 +11,45 @@ FOLDER_ID = '1rtAgG3tsUk8KdiIzDSE2hZSCBrqOM_-4'
 # API Key should be set in Vercel Environment Variables
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 
+@app.get("/api/check-pdf")
+def check_pdf(serialNumber: str):
+    if not API_KEY:
+        raise HTTPException(status_code=500, detail="Server misconfiguration: API Key missing")
+
+    try:
+        service = build('drive', 'v3', developerKey=API_KEY)
+        
+        # Exact name match, looking for PDF files
+        # We search specifically for the serial number as the exact file name
+        query = f"'{FOLDER_ID}' in parents and name = '{serialNumber}.pdf' and trashed = false and mimeType = 'application/pdf'"
+        
+        results = service.files().list(
+            q=query, 
+            pageSize=1, 
+            fields="files(id, name, webViewLink)"
+        ).execute()
+        
+        files = results.get('files', [])
+
+        if not files:
+            # Try without .pdf extension just in case
+            query_alt = f"'{FOLDER_ID}' in parents and name = '{serialNumber}' and trashed = false and mimeType = 'application/pdf'"
+            results_alt = service.files().list(
+                q=query_alt, 
+                pageSize=1, 
+                fields="files(id, name, webViewLink)"
+            ).execute()
+            files = results_alt.get('files', [])
+
+        if files:
+            return {"exists": True, "webViewLink": files[0]['webViewLink'], "name": files[0]['name']}
+        
+        return {"exists": False}
+
+    except Exception as e:
+        print(f"Error checking PDF in Drive: {str(e)}")
+        return {"exists": False, "error": str(e)}
+
 @app.get("/api/fetch-report")
 def fetch_report(productId: str):
     if not API_KEY:
