@@ -16,7 +16,8 @@
     "jspdf-autotable": "^3.8.2",
     "html2canvas": "^1.4.1",
     "xlsx": "^0.18.5",
-    "qrcode": "^1.5.3"
+    "qrcode": "^1.5.3",
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.61",
