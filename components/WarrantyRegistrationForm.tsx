@@ -15,6 +15,7 @@ export const WarrantyRegistrationForm: React.FC = () => {
     customer_name: '',
     phone_number: '',
     email: '',
+    invoice_number: '',
   });
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -42,7 +43,7 @@ export const WarrantyRegistrationForm: React.FC = () => {
   };
 
   const handleReset = () => {
-    setFormData({ serial_number: '', customer_name: '', phone_number: '', email: '' });
+    setFormData({ serial_number: '', customer_name: '', phone_number: '', email: '', invoice_number: '' });
     setFormState('idle');
     setErrorMessage('');
   };
@@ -122,6 +123,22 @@ export const WarrantyRegistrationForm: React.FC = () => {
               type="text"
               placeholder="e.g. DCE-2024-XXXXX"
               value={formData.serial_number}
+              onChange={handleChange}
+              required
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass} htmlFor="invoice_number">
+              Invoice Number <span className="text-red-400">*</span>
+            </label>
+            <input
+              id="invoice_number"
+              name="invoice_number"
+              type="text"
+              placeholder="e.g. INV-2024-001"
+              value={formData.invoice_number}
               onChange={handleChange}
               required
               className={inputClass}

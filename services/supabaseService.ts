@@ -17,6 +17,7 @@ export interface WarrantyRegistration {
   customer_name: string;
   phone_number: string;
   email: string;
+  invoice_number: string;
 }
 
 /** Check if a serial number already has a warranty registered */
@@ -44,6 +45,7 @@ export const registerWarranty = async (formData: WarrantyRegistration): Promise<
       customer_name: formData.customer_name.trim(),
       phone_number: formData.phone_number.trim(),
       email: formData.email.trim(),
+      invoice_number: formData.invoice_number.trim(),
     },
   ]);
 
