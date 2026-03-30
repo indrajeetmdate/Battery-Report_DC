@@ -38,19 +38,32 @@ export const BookCheckupForm: React.FC = () => {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setFormData(prev => ({ ...prev, location_data: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}` }));
-        setIsDetecting(false);
-      },
-      (error) => {
-        console.warn("Error getting location: ", error.message);
-        alert("Failed to detect location. Please type your location manually.");
-        setIsDetecting(false);
-      },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-    );
+    const getLocation = (highAccuracy: boolean) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData(prev => ({ ...prev, location_data: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}` }));
+          setIsDetecting(false);
+        },
+        (error) => {
+          if (highAccuracy && error.code !== error.PERMISSION_DENIED) {
+            console.warn("High accuracy failed, trying low accuracy: ", error.message);
+            getLocation(false);
+          } else {
+            console.warn("Error getting location: ", error.message);
+            if (error.code === error.PERMISSION_DENIED) {
+              alert("Location permission denied. Please type your location manually.");
+            } else {
+              alert("Failed to detect location. Please type your location manually.");
+            }
+            setIsDetecting(false);
+          }
+        },
+        { enableHighAccuracy: highAccuracy, timeout: 20000, maximumAge: 10000 }
+      );
+    };
+
+    getLocation(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
