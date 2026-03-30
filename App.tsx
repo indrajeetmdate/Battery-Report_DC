@@ -97,6 +97,14 @@ const App: React.FC = () => {
               >
                 Free Checkup
               </button>
+              <a 
+                href="https://cnergy.co.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-semibold text-gray-500 hover:text-[#78AD3E] transition-colors"
+              >
+                DC Website
+              </a>
             </nav>
 
           <div className="flex items-center gap-4">
@@ -116,13 +124,22 @@ const App: React.FC = () => {
             <div className="md:hidden flex gap-2">
                <select 
                  value={mode} 
-                 onChange={(e) => { setMode(e.target.value as AppMode); setStep(1); }}
+                 onChange={(e) => { 
+                   if (e.target.value === 'website') {
+                     window.open('https://cnergy.co.in/', '_blank');
+                     e.target.value = mode;
+                     return;
+                   }
+                   setMode(e.target.value as AppMode); 
+                   setStep(1); 
+                 }}
                  className="bg-gray-50 border border-gray-200 text-sm rounded-lg focus:ring-[#78AD3E] focus:border-[#78AD3E] block w-full p-2.5"
                >
                  <option value="home">Home</option>
                  <option value="warranty">Warranty Registration</option>
                  <option value="report">Report Generation</option>
                  <option value="booking">Free Checkup</option>
+                 <option value="website">DC Website ↗</option>
                </select>
             </div>
           </div>
