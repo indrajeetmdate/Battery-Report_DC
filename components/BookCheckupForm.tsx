@@ -5,9 +5,9 @@ import { Crosshair, MapPin, CheckCircle, AlertTriangle, Loader2, Wrench } from '
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 type TimeSlot = 'Morning (10 AM - 2 PM)' | 'Afternoon (2 PM - 6 PM)';
 
-// Utilitarian Input Class
-const inputClass = 'w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 focus:outline-none focus:border-[#78AD3E] text-[#1A1C19] font-medium transition-colors placeholder-gray-400 font-sans';
-const labelClass = 'block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2';
+// Utilitarian Pill Input Class
+const inputClass = 'w-full px-6 py-3.5 bg-gray-50 border-2 border-gray-200 focus:outline-none focus:border-[#78AD3E] text-[#1A1C19] font-medium transition-colors placeholder-gray-400 font-sans rounded-full';
+const labelClass = 'block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 ml-4';
 
 export const BookCheckupForm: React.FC = () => {
   const [formData, setFormData] = useState<CheckupBooking>({
@@ -85,7 +85,7 @@ export const BookCheckupForm: React.FC = () => {
           </p>
           <button
             onClick={handleReset}
-            className="w-full sm:w-auto px-8 py-4 bg-[#1A1C19] text-white font-bold uppercase tracking-widest hover:bg-[#78AD3E] transition-colors border-2 border-transparent focus:outline-none"
+            className="w-full sm:w-auto px-8 py-4 bg-[#1A1C19] text-white font-bold uppercase tracking-widest hover:bg-[#78AD3E] transition-colors border-2 border-transparent focus:outline-none rounded-full"
           >
             BOOK ANOTHER SLOT
           </button>
@@ -103,9 +103,6 @@ export const BookCheckupForm: React.FC = () => {
     <div className="w-full max-w-2xl mx-auto animate-fadeIn">
       {/* Eco-Utilitarian Header block */}
       <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1A1C19] text-[#78AD3E] text-xs font-bold font-mono mb-4 uppercase">
-          <Wrench className="w-3 h-3" /> System Diagnostics
-        </div>
         <h2 className="text-4xl md:text-5xl font-black text-[#1A1C19] uppercase tracking-tighter leading-none mb-3">
           Free Checkup<br/>
           <span className="text-[#78AD3E]">Slot Request</span>
@@ -116,7 +113,7 @@ export const BookCheckupForm: React.FC = () => {
         </p>
       </div>
 
-      <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19]">
+      <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl">
         <form onSubmit={handleSubmit} className="p-8 space-y-8">
           
           <div className="space-y-6">
@@ -140,7 +137,7 @@ export const BookCheckupForm: React.FC = () => {
               <label className={labelClass} htmlFor="location_data">Service Location</label>
               <div className="flex gap-3 flex-col sm:flex-row">
                 <div className="relative flex-grow">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                     <MapPin className="w-5 h-5 text-gray-400" />
                   </div>
                   <input
@@ -151,14 +148,14 @@ export const BookCheckupForm: React.FC = () => {
                     value={formData.location_data}
                     onChange={handleChange}
                     required
-                    className={`${inputClass} pl-12`}
+                  className={`${inputClass} pl-14`}
                   />
                 </div>
                 <button
                   type="button"
                   onClick={handleDetectLocation}
                   disabled={isDetecting}
-                  className="sm:w-auto w-full px-5 py-3.5 bg-gray-100 hover:bg-[#78AD3E] hover:text-white border-2 border-gray-200 hover:border-[#78AD3E] text-gray-600 font-bold uppercase tracking-wider transition-colors flex items-center gap-2 disabled:opacity-50"
+                  className="sm:w-auto w-full px-8 py-3.5 bg-gray-100 hover:bg-[#78AD3E] hover:text-white border-2 border-gray-200 hover:border-[#78AD3E] text-gray-600 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 disabled:opacity-50 rounded-full"
                   title="Detect GPS Location"
                 >
                   <Crosshair className={`w-5 h-5 ${isDetecting ? 'animate-spin' : ''}`} />
@@ -191,7 +188,7 @@ export const BookCheckupForm: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleTimeSlotChange('Morning (10 AM - 2 PM)')}
-                  className={`py-4 px-6 border-2 font-bold uppercase transition-all flex items-center justify-center
+                  className={`py-4 px-6 border-2 font-bold uppercase transition-all flex items-center justify-center rounded-full
                     ${formData.time_slot === 'Morning (10 AM - 2 PM)' 
                       ? 'border-[#1A1C19] bg-[#1A1C19] text-[#78AD3E]' 
                       : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
@@ -201,7 +198,7 @@ export const BookCheckupForm: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleTimeSlotChange('Afternoon (2 PM - 6 PM)')}
-                  className={`py-4 px-6 border-2 font-bold uppercase transition-all flex items-center justify-center
+                  className={`py-4 px-6 border-2 font-bold uppercase transition-all flex items-center justify-center rounded-full
                     ${formData.time_slot === 'Afternoon (2 PM - 6 PM)' 
                       ? 'border-[#1A1C19] bg-[#1A1C19] text-[#78AD3E]' 
                       : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
@@ -224,7 +221,7 @@ export const BookCheckupForm: React.FC = () => {
             <button
               type="submit"
               disabled={formState === 'loading'}
-              className="w-full py-5 bg-[#78AD3E] text-white font-black text-lg uppercase tracking-widest border-2 border-[#78AD3E] hover:bg-[#1A1C19] hover:border-[#1A1C19] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-5 bg-[#78AD3E] text-white font-black text-lg uppercase tracking-widest border-2 border-[#78AD3E] hover:bg-[#1A1C19] hover:border-[#1A1C19] transition-all disabled:opacity-50 flex items-center justify-center gap-2 rounded-full"
             >
               {formState === 'loading' ? (
                 <>

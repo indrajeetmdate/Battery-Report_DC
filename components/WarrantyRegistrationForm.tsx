@@ -5,9 +5,9 @@ import { Shield, CheckCircle, AlertCircle, Loader2, FileText, ExternalLink } fro
 type FormState = 'idle' | 'loading' | 'success' | 'error' | 'duplicate';
 
 const inputClass =
-  'w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#78AD3E] focus:border-transparent bg-white text-[#41463F] placeholder-gray-400 transition-all duration-200';
+  'w-full px-6 py-3.5 bg-gray-50 border-2 border-gray-200 focus:outline-none focus:border-[#78AD3E] text-[#1A1C19] font-medium transition-colors placeholder-gray-400 font-sans rounded-full';
 
-const labelClass = 'block text-sm font-semibold text-[#41463F] mb-1.5';
+const labelClass = 'block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 ml-4';
 
 interface WarrantyRegistrationFormProps {
   onNoReportFound: (serialNumber: string) => void;
@@ -78,87 +78,89 @@ export const WarrantyRegistrationForm: React.FC<WarrantyRegistrationFormProps> =
 
   if (formState === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-16 px-6 animate-fadeIn">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle className="w-10 h-10 text-[#78AD3E]" />
-        </div>
-        <h2 className="text-2xl font-bold text-[#41463F] mb-2">Warranty Registered!</h2>
-        <p className="text-gray-500 max-w-md mb-2">
-          Your product has been successfully registered.
-        </p>
-        <p className="text-sm text-gray-400 mb-8">
-          Serial: <span className="font-medium text-[#41463F]">{formData.serial_number}</span>
-        </p>
-
-        {pdfReportLink && (
-          <div className="bg-[#78AD3E]/10 border border-[#78AD3E]/20 rounded-2xl p-6 mb-8 max-w-sm w-full animate-bounceIn">
-            <div className="flex items-center gap-3 mb-3 justify-center">
-              <FileText className="w-5 h-5 text-[#78AD3E]" />
-              <h3 className="font-bold text-[#41463F]">Test Report Found!</h3>
-            </div>
-            <p className="text-xs text-gray-500 mb-4">An official test report for this product is available.</p>
-            <a
-              href={pdfReportLink.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-[#78AD3E] text-[#78AD3E] font-bold rounded-xl hover:bg-[#78AD3E] hover:text-white transition-all shadow-sm"
-            >
-              <ExternalLink className="w-4 h-4" /> View PDF Report
-            </a>
+      <div className="w-full max-w-xl mx-auto animate-fadeIn mt-8">
+        <div className="border-4 border-[#78AD3E] bg-white p-10 flex flex-col items-center justify-center text-center shadow-[8px_8px_0_0_#78AD3E] rounded-3xl">
+          <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6 border-2 border-[#78AD3E]">
+            <CheckCircle className="w-10 h-10 text-[#78AD3E]" />
           </div>
-        )}
-        <button
-          onClick={handleReset}
-          className="px-6 py-2.5 rounded-xl bg-[#78AD3E] text-white font-semibold hover:bg-[#6a9836] transition-colors"
-        >
-          Register Another Product
-        </button>
+          <h2 className="text-3xl font-black text-[#1A1C19] mb-4 uppercase tracking-tight">Warranty<br/>Registered!</h2>
+          <p className="text-gray-600 font-medium mb-2 max-w-sm">
+            Your product has been successfully registered.
+          </p>
+          <p className="text-sm font-bold text-gray-400 mb-8 uppercase tracking-wider">
+            Serial: <span className="text-[#1A1C19]">{formData.serial_number}</span>
+          </p>
+
+          {pdfReportLink && (
+            <div className="bg-[#78AD3E]/10 border-2 border-[#78AD3E] rounded-3xl p-6 mb-8 max-w-sm w-full animate-bounceIn">
+              <div className="flex items-center gap-3 mb-3 justify-center">
+                <FileText className="w-5 h-5 text-[#1A1C19]" />
+                <h3 className="font-bold text-[#1A1C19] uppercase">Test Report Found!</h3>
+              </div>
+              <p className="text-sm font-medium text-gray-600 mb-6">An official test report for this product is available.</p>
+              <a
+                href={pdfReportLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 px-6 py-3.5 bg-white border-2 border-[#1A1C19] text-[#1A1C19] font-bold uppercase tracking-wider rounded-full hover:bg-[#1A1C19] hover:text-white transition-all shadow-sm"
+              >
+                <ExternalLink className="w-4 h-4" /> View PDF Report
+              </a>
+            </div>
+          )}
+          <button
+            onClick={handleReset}
+            className="w-full sm:w-auto px-8 py-4 bg-[#1A1C19] text-white font-bold uppercase tracking-widest hover:bg-[#78AD3E] transition-colors border-2 border-transparent focus:outline-none rounded-full"
+          >
+            Register Another
+          </button>
+        </div>
       </div>
     );
   }
 
   if (formState === 'duplicate') {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-16 px-6 animate-fadeIn">
-        <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
-          <AlertCircle className="w-10 h-10 text-amber-500" />
+      <div className="w-full max-w-xl mx-auto animate-fadeIn mt-8">
+        <div className="border-4 border-amber-400 bg-white p-10 flex flex-col items-center justify-center text-center shadow-[8px_8px_0_0_#fbbf24] rounded-3xl">
+          <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mb-6 border-2 border-amber-400">
+            <AlertCircle className="w-10 h-10 text-amber-500" />
+          </div>
+          <h2 className="text-3xl font-black text-[#1A1C19] mb-4 uppercase tracking-tight">Already<br/>Registered</h2>
+          <p className="text-gray-600 font-medium mb-2 max-w-sm">
+            This serial number is already registered for warranty.
+          </p>
+          <p className="text-sm font-bold text-gray-400 mb-8 uppercase tracking-wider">
+            Serial: <span className="text-[#1A1C19]">{formData.serial_number}</span>
+          </p>
+          <button
+            onClick={handleReset}
+            className="w-full sm:w-auto px-8 py-4 bg-[#1A1C19] text-white font-bold uppercase tracking-widest hover:bg-amber-500 transition-colors border-2 border-transparent focus:outline-none rounded-full"
+          >
+            Try a Different Serial
+          </button>
         </div>
-        <h2 className="text-2xl font-bold text-[#41463F] mb-2">Already Registered</h2>
-        <p className="text-gray-500 max-w-md mb-2">
-          This serial number is already registered for warranty.
-        </p>
-        <p className="text-sm text-gray-400 mb-8">
-          Serial: <span className="font-medium text-[#41463F]">{formData.serial_number}</span>
-        </p>
-        <button
-          onClick={handleReset}
-          className="px-6 py-2.5 rounded-xl bg-[#78AD3E] text-white font-semibold hover:bg-[#6a9836] transition-colors"
-        >
-          Try a Different Serial
-        </button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto w-full animate-fadeIn">
-      {/* Card */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Card Header */}
-        <div className="bg-gradient-to-r from-[#78AD3E] to-[#5d8a2e] px-8 py-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">Warranty Registration</h2>
-              <p className="text-green-100 text-sm">Register your DC Energy product</p>
-            </div>
-          </div>
-        </div>
+    <div className="w-full max-w-2xl mx-auto animate-fadeIn">
+      {/* Eco-Utilitarian Header block */}
+      <div className="mb-8 pl-2">
+        <h2 className="text-4xl md:text-5xl font-black text-[#1A1C19] uppercase tracking-tighter leading-none mb-3">
+          Warranty<br/>
+          <span className="text-[#78AD3E]">Registration</span>
+        </h2>
+        <p className="text-gray-500 font-medium max-w-md">
+          Register your DC Energy product to ensure official support and tracking.
+        </p>
+      </div>
 
+      {/* Card */}
+      <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl overflow-hidden p-8">
         {/* Form */}
-        <form onSubmit={handleSubmit} className="px-8 py-7 space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className={labelClass} htmlFor="serial_number">
               Serial Number <span className="text-red-400">*</span>
@@ -246,23 +248,23 @@ export const WarrantyRegistrationForm: React.FC<WarrantyRegistrationFormProps> =
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={formState === 'loading'}
-            className="w-full py-3.5 bg-[#78AD3E] hover:bg-[#6a9836] disabled:bg-gray-300 text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-          >
-            {formState === 'loading' ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Registering...
-              </>
-            ) : (
-              <>
-                <Shield className="w-5 h-5" />
-                Register Warranty
-              </>
-            )}
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={formState === 'loading'}
+              className="w-full py-5 bg-[#78AD3E] text-white font-black text-lg uppercase tracking-widest border-2 border-[#78AD3E] hover:bg-[#1A1C19] hover:border-[#1A1C19] transition-all disabled:opacity-50 flex items-center justify-center gap-2 rounded-full"
+            >
+              {formState === 'loading' ? (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin" /> Processing...
+                </>
+              ) : (
+                <>
+                  <Shield className="w-6 h-6" /> REGISTER
+                </>
+              )}
+            </button>
+          </div>
 
           <p className="text-xs text-center text-gray-400 pt-1">
             By registering, you confirm you are the product owner. Warranty terms apply.

@@ -12,12 +12,12 @@ export const Button: React.FC<ButtonProps> = ({
   className = '', 
   ...props 
 }) => {
-  const baseStyles = "px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseStyles = "px-6 py-3 rounded-full font-bold uppercase tracking-wider transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed border-2 border-transparent";
   
   const variants = {
-    primary: "bg-[#78AD3E] hover:bg-[#659234] text-white focus:ring-[#78AD3E]",
-    secondary: "bg-[#B4D192] hover:bg-[#A3C47D] text-[#41463F] focus:ring-[#B4D192]",
-    outline: "border border-[#78AD3E] text-[#78AD3E] hover:bg-[#F0F5E9] focus:ring-[#78AD3E]"
+    primary: "bg-[#78AD3E] border-[#78AD3E] hover:bg-[#1A1C19] hover:border-[#1A1C19] text-white shadow-sm",
+    secondary: "bg-[#1A1C19] border-[#1A1C19] text-white hover:bg-[#78AD3E] hover:border-[#78AD3E]",
+    outline: "border-[#1A1C19] text-[#1A1C19] hover:bg-[#1A1C19] hover:text-white border-2"
   };
 
   const widthStyle = fullWidth ? "w-full" : "";

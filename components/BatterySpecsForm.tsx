@@ -86,22 +86,26 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
 
   const APP_OPTIONS = ["2W EV", "3W EV", "Solar Street Light", "UPS", "Inverter", "ESS"];
 
+  const inputClass = "w-full px-6 py-3.5 bg-gray-50 border-2 border-gray-200 focus:outline-none focus:border-[#78AD3E] text-[#1A1C19] font-medium transition-colors placeholder-gray-400 font-sans rounded-full";
+  const disabledInputClass = "w-full px-6 py-3.5 bg-gray-100 border-2 border-gray-200 text-gray-400 font-medium rounded-full cursor-not-allowed";
+  const labelClass = "block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 ml-4";
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-      <h2 className="text-xl font-bold text-[#41463F] mb-4 flex items-center gap-2">
-        <span className="w-2 h-6 bg-[#78AD3E] rounded-full"></span>
+    <div className="bg-white p-8 rounded-3xl border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19]">
+      <h2 className="text-2xl font-black text-[#1A1C19] mb-6 uppercase tracking-tighter flex items-center gap-3">
+        <span className="w-3 h-8 bg-[#78AD3E] rounded-full"></span>
         Battery Specifications
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
         {/* --- Editable Fields --- */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Chemistry</label>
+          <label className={labelClass}>Chemistry</label>
           <select
             name="chemistry"
             value={specs.chemistry}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E] bg-white"
+            className={inputClass}
           >
             <option value="LFP">LFP (Lithium Iron Phosphate)</option>
             <option value="NMC">NMC (Nickel Manganese Cobalt)</option>
@@ -109,12 +113,12 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Cell Type</label>
+           <label className={labelClass}>Cell Type</label>
           <select
             name="cellType"
             value={specs.cellType}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E] bg-white"
+            className={inputClass}
           >
             {Object.keys(CELL_SPECS).map(type => (
               <option key={type} value={type}>{type}</option>
@@ -123,33 +127,33 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
         </div>
 
         <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Series (S)</label>
+          <div className="flex-[2]">
+            <label className={labelClass}>Series</label>
             <input
               type="number"
               name="series"
               value={specs.series}
               onChange={handleChange}
               min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E]"
+              className={inputClass}
             />
           </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Parallel (P)</label>
+          <div className="flex-[2]">
+            <label className={labelClass}>Parallel</label>
             <input
               type="number"
               name="parallel"
               value={specs.parallel}
               onChange={handleChange}
               min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E]"
+              className={inputClass}
             />
           </div>
         </div>
 
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Dimensions (mm)</label>
+          <label className={labelClass}>Dimensions (L W H)</label>
           <div className="flex gap-2">
             <input
               type="number"
@@ -157,7 +161,7 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
               placeholder="L"
               value={specs.length || ''}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E]"
+              className={inputClass}
             />
             <input
               type="number"
@@ -165,7 +169,7 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
               placeholder="W"
               value={specs.width || ''}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E]"
+              className={inputClass}
             />
             <input
               type="number"
@@ -173,69 +177,69 @@ export const BatterySpecsForm: React.FC<BatterySpecsFormProps> = ({ specs, onCha
               placeholder="H"
               value={specs.height || ''}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E]"
+              className={inputClass}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nominal Voltage (V) <span className="text-xs text-gray-400 font-normal">(Auto-calculated)</span></label>
+          <label className={labelClass}>Nominal Voltage (V)</label>
           <input
             type="number"
             name="nominalVoltage"
             value={specs.nominalVoltage}
             onChange={handleChange}
             step="0.1"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#78AD3E] focus:border-[#78AD3E] bg-gray-50"
+            className={inputClass}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Rated Capacity (Ah) <span className="text-xs text-gray-400 font-normal">(Auto-calculated)</span></label>
+          <label className={labelClass}>Rated Capacity (Ah)</label>
           <input
             type="number"
             name="ratedCapacity"
             value={specs.ratedCapacity}
             readOnly
             disabled
-            className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-500 rounded-md cursor-not-allowed"
+            className={disabledInputClass}
           />
         </div>
 
         {/* --- Read-Only Fields --- */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Rated Life Cycle</label>
+          <label className={labelClass}>Rated Life Cycle</label>
           <input
             type="number"
             name="ratedLifeCycle"
             value={specs.ratedLifeCycle}
             readOnly
             disabled
-            className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-500 rounded-md cursor-not-allowed"
+            className={disabledInputClass}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">BMS Type</label>
+          <label className={labelClass}>BMS Type</label>
           <input
             type="text"
             name="bms"
             value="Yes (Passive)"
             readOnly
             disabled
-            className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-500 rounded-md cursor-not-allowed"
+            className={disabledInputClass}
           />
         </div>
 
         <div className="">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Warranty Period</label>
+          <label className={labelClass}>Warranty Period</label>
           <input
             type="text"
             name="warrantyPeriod"
             value={specs.warrantyPeriod}
             readOnly
             disabled
-            className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-500 rounded-md cursor-not-allowed"
+            className={disabledInputClass}
           />
         </div>
       </div>

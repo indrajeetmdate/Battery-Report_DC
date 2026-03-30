@@ -10,11 +10,12 @@ import { generatePDF } from './services/pdfService';
 import { BatterySpecs, ProcessedData } from './types';
 import { DEFAULT_SPECS, LOGO_URL } from './constants';
 import { ChevronLeft, FileText, Settings, LayoutDashboard, Wrench } from 'lucide-react';
-
-type AppMode = 'home' | 'warranty' | 'report' | 'booking';
+import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 
 const App: React.FC = () => {
-  const [mode, setMode] = useState<AppMode>('home');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const mode = location.pathname === '/' ? 'home' : location.pathname.substring(1).split('/')[0];
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [specs, setSpecs] = useState<BatterySpecs>(DEFAULT_SPECS);
@@ -59,7 +60,7 @@ const App: React.FC = () => {
   };
 
   const goHome = () => {
-    setMode('home');
+    navigate('/');
     setStep(1);
     setData(null);
     setInitialSearchTerm('');
@@ -79,24 +80,27 @@ const App: React.FC = () => {
           <div className="flex flex-1 items-center justify-end gap-6">
             {/* Top Navigation Links */}
             <nav className="hidden md:flex items-center gap-6">
-              <button 
-                onClick={() => { setMode('warranty'); setStep(1); }}
+              <Link 
+                to="/warranty"
+                onClick={() => setStep(1)}
                 className={`text-sm font-semibold transition-colors ${mode === 'warranty' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
               >
                 Warranty Registration
-              </button>
-              <button 
-                onClick={() => { setMode('report'); setStep(1); }}
+              </Link>
+              <Link 
+                to="/report"
+                onClick={() => setStep(1)}
                 className={`text-sm font-semibold transition-colors ${mode === 'report' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
               >
                 Report Generation
-              </button>
-              <button 
-                onClick={() => { setMode('booking'); setStep(1); }}
+              </Link>
+              <Link 
+                to="/booking"
+                onClick={() => setStep(1)}
                 className={`text-sm font-semibold transition-colors ${mode === 'booking' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
               >
                 Free Checkup
-              </button>
+              </Link>
               <a 
                 href="https://cnergy.co.in/"
                 target="_blank"
@@ -130,7 +134,7 @@ const App: React.FC = () => {
                      e.target.value = mode;
                      return;
                    }
-                   setMode(e.target.value as AppMode); 
+                   navigate(`/${e.target.value === 'home' ? '' : e.target.value}`); 
                    setStep(1); 
                  }}
                  className="bg-gray-50 border border-gray-200 text-sm rounded-lg focus:ring-[#78AD3E] focus:border-[#78AD3E] block w-full p-2.5"
@@ -149,74 +153,73 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        {/* ===== HOME MODE ===== */}
-        {mode === 'home' && (
-          <div className="flex flex-col items-center justify-center min-h-[70vh] animate-fadeIn">
-            {/* Hero */}
-            <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 text-[#78AD3E] text-sm font-semibold px-4 py-1.5 rounded-full mb-6">
-                DC Energy Support
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-[#41463F] mb-4 leading-tight max-w-3xl mx-auto">
-                Limited time offer: Free checkup for your Inverters and Batteries.
-              </h2>
-              <p className="text-gray-500 text-lg max-w-xl mx-auto">
-                Register your product warranty or access your battery test reports.
-              </p>
-            </div>
-
-            {/* Single Action Card on Home */}
-            <div className="flex justify-center w-full max-w-lg px-4">
-
-              {/* Free Checkup Card */}
-              <button
-                onClick={() => setMode('booking')}
-                className="group bg-white rounded-2xl p-8 border-2 border-gray-200 shadow-md hover:shadow-xl hover:border-[#1A1C19] hover:-translate-y-1 transition-all duration-300 text-left relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 p-3 bg-[#78AD3E] text-white text-xs font-bold tracking-wider uppercase rounded-bl-xl shadow-sm">
-                  Free
+        <Routes>
+          {/* ===== HOME MODE ===== */}
+          <Route path="/" element={
+            <div className="flex flex-col items-center justify-center min-h-[70vh] animate-fadeIn">
+              {/* Hero */}
+              <div className="text-center mb-14">
+                <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 text-[#78AD3E] text-sm font-semibold px-4 py-1.5 rounded-full mb-6 uppercase">
+                  DC Energy Support
                 </div>
-                <div className="w-14 h-14 bg-gray-100 group-hover:bg-[#1A1C19] border-2 border-transparent group-hover:border-[#78AD3E] rounded-2xl flex items-center justify-center mb-5 transition-all duration-300">
-                  <Wrench className="w-7 h-7 text-gray-500 group-hover:text-[#78AD3E] transition-colors duration-300" />
-                </div>
-                <h3 className="text-xl font-bold text-[#1A1C19] mb-2 uppercase tracking-tight">Book Checkup</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  Schedule a complimentary diagnostic checkup for your DC Energy inverter and battery units.
+                <h2 className="text-4xl md:text-5xl font-bold text-[#41463F] mb-4 leading-tight max-w-3xl mx-auto">
+                  Limited time offer: Free checkup for your Inverters and Batteries.
+                </h2>
+                <p className="text-gray-500 text-lg max-w-xl mx-auto">
+                  Register your product warranty or access your battery test reports.
                 </p>
-                <div className="mt-5 flex items-center gap-1 text-[#1A1C19] group-hover:text-[#78AD3E] text-sm font-bold uppercase tracking-wider transition-colors">
-                  Request Slot <ChevronLeft className="w-4 h-4 rotate-180" />
-                </div>
-              </button>
+              </div>
+
+              {/* Single Action Card on Home */}
+              <div className="flex justify-center w-full max-w-lg px-4">
+                {/* Free Checkup Card */}
+                <button
+                  onClick={() => navigate('/booking')}
+                  className="group bg-white rounded-3xl p-8 border-2 border-gray-200 shadow-md hover:shadow-xl hover:border-[#1A1C19] hover:-translate-y-1 transition-all duration-300 text-left relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 p-3 bg-[#78AD3E] text-white text-xs font-bold tracking-wider uppercase rounded-bl-3xl shadow-sm">
+                    Free
+                  </div>
+                  <div className="w-14 h-14 bg-gray-100 group-hover:bg-[#1A1C19] border-2 border-transparent group-hover:border-[#78AD3E] rounded-full flex items-center justify-center mb-5 transition-all duration-300">
+                    <Wrench className="w-7 h-7 text-gray-500 group-hover:text-[#78AD3E] transition-colors duration-300" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#1A1C19] mb-2 uppercase tracking-tight">Book Checkup</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    Schedule a complimentary diagnostic checkup for your DC Energy inverter and battery units.
+                  </p>
+                  <div className="mt-5 flex items-center gap-1 text-[#1A1C19] group-hover:text-[#78AD3E] text-sm font-bold uppercase tracking-wider transition-colors">
+                    Request Slot <ChevronLeft className="w-4 h-4 rotate-180" />
+                  </div>
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          } />
 
-        {/* ===== WARRANTY MODE ===== */}
-        {mode === 'warranty' && (
-          <div className="flex flex-col items-center pt-6 animate-fadeIn">
-            <WarrantyRegistrationForm 
-              onNoReportFound={(serial) => {
-                setInitialSearchTerm(serial);
-                setMode('report');
-                setStep(1);
-              }}
-            />
-          </div>
-        )}
+          {/* ===== WARRANTY MODE ===== */}
+          <Route path="/warranty" element={
+            <div className="flex flex-col items-center pt-6 animate-fadeIn">
+              <WarrantyRegistrationForm 
+                onNoReportFound={(serial) => {
+                  setInitialSearchTerm(serial);
+                  navigate('/report');
+                  setStep(1);
+                }}
+              />
+            </div>
+          } />
 
-        {/* ===== BOOKING MODE ===== */}
-        {mode === 'booking' && (
-          <div className="flex flex-col items-center pt-6 animate-fadeIn">
-            <BookCheckupForm />
-          </div>
-        )}
+          {/* ===== BOOKING MODE ===== */}
+          <Route path="/booking" element={
+            <div className="flex flex-col items-center pt-6 animate-fadeIn">
+              <BookCheckupForm />
+            </div>
+          } />
 
-        {/* ===== REPORT MODE ===== */}
-        {mode === 'report' && (
-          <>
-            {/* Step 1: Product Search */}
-            {step === 1 && (
+          {/* ===== REPORT MODE ===== */}
+          <Route path="/report" element={
+            <>
+              {/* Step 1: Product Search */}
+              {step === 1 && (
               <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fadeIn">
                 <div className="text-center mb-10">
                   <h2 className="text-3xl font-bold text-[#41463F] mb-3">Battery Report Generator</h2>
@@ -268,13 +271,13 @@ const App: React.FC = () => {
                     <ChevronLeft className="w-5 h-5 mr-1" /> Edit Specifications
                   </button>
                   <div className="flex items-center gap-3">
-                    <Button variant="outline" onClick={() => setStep(1)}>
+                    <Button variant="outline" onClick={() => setStep(1)} className="rounded-full border-2 border-[#1A1C19] text-[#1A1C19] font-bold uppercase tracking-wider">
                       Search Another ID
                     </Button>
                     <Button
                       onClick={handleGeneratePDF}
                       disabled={loading}
-                      className="flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+                      className="flex items-center gap-2 rounded-full font-bold uppercase tracking-wider border-2 border-[#78AD3E] bg-[#78AD3E] hover:bg-[#1A1C19] hover:border-[#1A1C19] shadow-md transition-all text-white"
                     >
                       {loading ? (
                         'Generating...'
@@ -289,8 +292,9 @@ const App: React.FC = () => {
                 <Dashboard data={data} />
               </div>
             )}
-          </>
-        )}
+            </>
+          } />
+        </Routes>
       </main>
 
       {/* Footer */}

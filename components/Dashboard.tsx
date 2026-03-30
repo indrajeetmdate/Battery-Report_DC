@@ -15,7 +15,7 @@ interface ChartCardProps {
 
 const ChartCard = ({ title, id, children }: ChartCardProps) => (
   // Reduced height from 350px to 280px to create a wider aspect ratio that fits the single-page PDF better
-  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col h-[280px]" id={id}>
+  <div className="bg-white p-4 rounded-3xl border-2 border-gray-200 shadow-[4px_4px_0_0_#1A1C19] flex flex-col h-[280px]" id={id}>
     <h3 className="text-sm font-bold text-[#41463F] mb-2 uppercase tracking-wider border-b border-gray-100 pb-2">
       {title}
     </h3>
@@ -115,9 +115,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
         </ChartCard>
       </div>
 
-      <div className="mt-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-[#41463F] mb-4">Loop Summary</h3>
+      <div className="mt-8 mb-4">
+        <div className="bg-white p-8 rounded-3xl border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19]">
+            <h3 className="text-xl font-bold text-[#1A1C19] mb-4 uppercase tracking-tighter">Loop Summary</h3>
             <div className="overflow-x-auto">
                 <table className="min-w-full text-sm text-left">
                     <thead className="bg-[#B4D192] text-[#41463F]">
