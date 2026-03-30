@@ -9,7 +9,7 @@ import { parseExcelFile } from './services/excelService';
 import { generatePDF } from './services/pdfService';
 import { BatterySpecs, ProcessedData } from './types';
 import { DEFAULT_SPECS, LOGO_URL } from './constants';
-import { ChevronLeft, FileText, Settings, LayoutDashboard, Shield, ClipboardList, Wrench } from 'lucide-react';
+import { ChevronLeft, FileText, Settings, LayoutDashboard, Wrench } from 'lucide-react';
 
 type AppMode = 'home' | 'warranty' | 'report' | 'booking';
 
@@ -70,15 +70,37 @@ const App: React.FC = () => {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <button onClick={goHome} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <button onClick={goHome} className="flex flex-shrink-0 items-center gap-3 hover:opacity-80 transition-opacity">
             <img src={LOGO_URL} alt="DC Energy" className="h-10 w-auto object-contain" />
-            <div className="hidden md:block h-6 w-px bg-gray-300 mx-2" />
-            <h1 className="hidden md:block text-xl font-semibold text-gray-700">DC Energy Portal</h1>
+            <div className="hidden lg:block h-6 w-px bg-gray-300 mx-2" />
+            <h1 className="hidden lg:block text-xl font-semibold text-gray-700">DC Energy Portal</h1>
           </button>
+
+          {/* Top Navigation Links */}
+          <nav className="hidden md:flex items-center gap-6">
+            <button 
+              onClick={() => { setMode('warranty'); setStep(1); }}
+              className={`text-sm font-semibold transition-colors ${mode === 'warranty' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
+            >
+              Warranty Registration
+            </button>
+            <button 
+              onClick={() => { setMode('report'); setStep(1); }}
+              className={`text-sm font-semibold transition-colors ${mode === 'report' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
+            >
+              Report Generation
+            </button>
+            <button 
+              onClick={() => { setMode('booking'); setStep(1); }}
+              className={`text-sm font-semibold transition-colors ${mode === 'booking' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
+            >
+              Free Checkup
+            </button>
+          </nav>
 
           <div className="flex items-center gap-4">
             {mode === 'report' && step > 1 && (
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+              <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-500">
                 <span className={`flex items-center gap-1 ${step === 2 ? 'text-[#78AD3E]' : ''}`}>
                   <Settings className="w-4 h-4" /> Specs
                 </span>
@@ -88,14 +110,20 @@ const App: React.FC = () => {
                 </span>
               </div>
             )}
-            {mode !== 'home' && (
-              <button
-                onClick={goHome}
-                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#78AD3E] transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" /> Home
-              </button>
-            )}
+            
+            {/* Mobile Menu Dropdown (Simplified to just modes) */}
+            <div className="md:hidden flex gap-2">
+               <select 
+                 value={mode} 
+                 onChange={(e) => { setMode(e.target.value as AppMode); setStep(1); }}
+                 className="bg-gray-50 border border-gray-200 text-sm rounded-lg focus:ring-[#78AD3E] focus:border-[#78AD3E] block w-full p-2.5"
+               >
+                 <option value="home">Home</option>
+                 <option value="warranty">Warranty Registration</option>
+                 <option value="report">Report Generation</option>
+                 <option value="booking">Free Checkup</option>
+               </select>
+            </div>
           </div>
         </div>
       </header>
@@ -120,41 +148,8 @@ const App: React.FC = () => {
               </p>
             </div>
 
-            {/* Three Action Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-4">
-              {/* Warranty Card */}
-              <button
-                onClick={() => setMode('warranty')}
-                className="group bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg hover:border-[#78AD3E] hover:-translate-y-1 transition-all duration-300 text-left"
-              >
-                <div className="w-14 h-14 bg-green-50 group-hover:bg-[#78AD3E] rounded-2xl flex items-center justify-center mb-5 transition-colors duration-300">
-                  <Shield className="w-7 h-7 text-[#78AD3E] group-hover:text-white transition-colors duration-300" />
-                </div>
-                <h3 className="text-xl font-bold text-[#41463F] mb-2">Register Warranty</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  Activate your product warranty by registering your serial number and contact details.
-                </p>
-                <div className="mt-5 flex items-center gap-1 text-[#78AD3E] text-sm font-semibold">
-                  Register now <ChevronLeft className="w-4 h-4 rotate-180" />
-                </div>
-              </button>
-
-              {/* Report Card */}
-              <button
-                onClick={() => setMode('report')}
-                className="group bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg hover:border-[#78AD3E] hover:-translate-y-1 transition-all duration-300 text-left"
-              >
-                <div className="w-14 h-14 bg-green-50 group-hover:bg-[#78AD3E] rounded-2xl flex items-center justify-center mb-5 transition-colors duration-300">
-                  <ClipboardList className="w-7 h-7 text-[#78AD3E] group-hover:text-white transition-colors duration-300" />
-                </div>
-                <h3 className="text-xl font-bold text-[#41463F] mb-2">Generate Report</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  Enter your Product ID to retrieve test data and generate your official certification report.
-                </p>
-                <div className="mt-5 flex items-center gap-1 text-[#78AD3E] text-sm font-semibold">
-                  Get report <ChevronLeft className="w-4 h-4 rotate-180" />
-                </div>
-              </button>
+            {/* Single Action Card on Home */}
+            <div className="flex justify-center w-full max-w-lg px-4">
 
               {/* Free Checkup Card */}
               <button
