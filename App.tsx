@@ -73,30 +73,31 @@ const App: React.FC = () => {
           <button onClick={goHome} className="flex flex-shrink-0 items-center gap-3 hover:opacity-80 transition-opacity">
             <img src={LOGO_URL} alt="DC Energy" className="h-10 w-auto object-contain" />
             <div className="hidden lg:block h-6 w-px bg-gray-300 mx-2" />
-            <h1 className="hidden lg:block text-xl font-semibold text-gray-700">DC Energy Portal</h1>
+            <h1 className="hidden lg:block text-xl font-semibold text-gray-700">Support</h1>
           </button>
 
-          {/* Top Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6">
-            <button 
-              onClick={() => { setMode('warranty'); setStep(1); }}
-              className={`text-sm font-semibold transition-colors ${mode === 'warranty' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
-            >
-              Warranty Registration
-            </button>
-            <button 
-              onClick={() => { setMode('report'); setStep(1); }}
-              className={`text-sm font-semibold transition-colors ${mode === 'report' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
-            >
-              Report Generation
-            </button>
-            <button 
-              onClick={() => { setMode('booking'); setStep(1); }}
-              className={`text-sm font-semibold transition-colors ${mode === 'booking' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
-            >
-              Free Checkup
-            </button>
-          </nav>
+          <div className="flex flex-1 items-center justify-end gap-6">
+            {/* Top Navigation Links */}
+            <nav className="hidden md:flex items-center gap-6">
+              <button 
+                onClick={() => { setMode('warranty'); setStep(1); }}
+                className={`text-sm font-semibold transition-colors ${mode === 'warranty' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
+              >
+                Warranty Registration
+              </button>
+              <button 
+                onClick={() => { setMode('report'); setStep(1); }}
+                className={`text-sm font-semibold transition-colors ${mode === 'report' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
+              >
+                Report Generation
+              </button>
+              <button 
+                onClick={() => { setMode('booking'); setStep(1); }}
+                className={`text-sm font-semibold transition-colors ${mode === 'booking' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
+              >
+                Free Checkup
+              </button>
+            </nav>
 
           <div className="flex items-center gap-4">
             {mode === 'report' && step > 1 && (
@@ -125,6 +126,7 @@ const App: React.FC = () => {
                </select>
             </div>
           </div>
+          </div>
         </div>
       </header>
 
@@ -137,11 +139,10 @@ const App: React.FC = () => {
             {/* Hero */}
             <div className="text-center mb-14">
               <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 text-[#78AD3E] text-sm font-semibold px-4 py-1.5 rounded-full mb-6">
-                <span className="w-2 h-2 rounded-full bg-[#78AD3E] animate-pulse" />
-                DC Energy Official Portal
+                DC Energy Support
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-[#41463F] mb-4 leading-tight">
-                Welcome to DC Energy
+              <h2 className="text-4xl md:text-5xl font-bold text-[#41463F] mb-4 leading-tight max-w-3xl mx-auto">
+                Limited time offer: Free checkup for your Inverters and Batteries.
               </h2>
               <p className="text-gray-500 text-lg max-w-xl mx-auto">
                 Register your product warranty or access your battery test reports.
@@ -154,7 +155,7 @@ const App: React.FC = () => {
               {/* Free Checkup Card */}
               <button
                 onClick={() => setMode('booking')}
-                className="group bg-white rounded-2xl p-8 border-2 border-transparent shadow-[0_4px_20px_rgb(0,0,0,0.05)] hover:shadow-xl hover:border-[#1A1C19] hover:-translate-y-1 transition-all duration-300 text-left relative overflow-hidden"
+                className="group bg-white rounded-2xl p-8 border-2 border-gray-200 shadow-md hover:shadow-xl hover:border-[#1A1C19] hover:-translate-y-1 transition-all duration-300 text-left relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 p-3 bg-[#78AD3E] text-white text-xs font-bold tracking-wider uppercase rounded-bl-xl shadow-sm">
                   Free
@@ -278,11 +279,7 @@ const App: React.FC = () => {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} DC Energy. All rights reserved.</p>
-          <div className="flex items-center gap-2 mt-2 md:mt-0">
-            <span className="w-2 h-2 rounded-full bg-[#78AD3E]" />
-            System Operational
-          </div>
+          <p className="mx-auto md:mx-0">&copy; {new Date().getFullYear()} DC Energy. All rights reserved.</p>
         </div>
       </footer>
     </div>

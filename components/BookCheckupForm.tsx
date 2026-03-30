@@ -111,7 +111,8 @@ export const BookCheckupForm: React.FC = () => {
           <span className="text-[#78AD3E]">Slot Request</span>
         </h2>
         <p className="text-gray-500 font-medium max-w-md">
-          Request a complimentary technical inspection for your DC Energy Inverter & Battery units.
+          Request a complimentary technical inspection for your Inverter & Battery units.<br/>
+          <span className="text-sm mt-1 block italic text-gray-400">*Note: any repair can be done at additional cost.</span>
         </p>
       </div>
 
