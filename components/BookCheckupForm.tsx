@@ -12,6 +12,7 @@ const labelClass = 'block text-xs font-bold uppercase tracking-wider text-gray-5
 export const BookCheckupForm: React.FC = () => {
   const [formData, setFormData] = useState<CheckupBooking>({
     customer_name: '',
+    phone_number: '',
     location_data: '',
     checkup_date: '',
     time_slot: 'Morning (10 AM - 2 PM)',
@@ -67,7 +68,7 @@ export const BookCheckupForm: React.FC = () => {
   };
 
   const handleReset = () => {
-    setFormData({ customer_name: '', location_data: '', checkup_date: '', time_slot: 'Morning (10 AM - 2 PM)' });
+    setFormData({ customer_name: '', phone_number: '', location_data: '', checkup_date: '', time_slot: 'Morning (10 AM - 2 PM)' });
     setFormState('idle');
   };
 
@@ -126,6 +127,21 @@ export const BookCheckupForm: React.FC = () => {
                 type="text"
                 placeholder="FIRST LAST"
                 value={formData.customer_name}
+                onChange={handleChange}
+                required
+                className={inputClass}
+              />
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className={labelClass} htmlFor="phone_number">Phone Number</label>
+              <input
+                id="phone_number"
+                name="phone_number"
+                type="tel"
+                placeholder="+91 XXXXX XXXXX"
+                value={formData.phone_number}
                 onChange={handleChange}
                 required
                 className={inputClass}
