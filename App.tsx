@@ -4,13 +4,14 @@ import { BatterySpecsForm } from './components/BatterySpecsForm';
 import { Dashboard } from './components/Dashboard';
 import { Button } from './components/Button';
 import { WarrantyRegistrationForm } from './components/WarrantyRegistrationForm';
+import { BookCheckupForm } from './components/BookCheckupForm';
 import { parseExcelFile } from './services/excelService';
 import { generatePDF } from './services/pdfService';
 import { BatterySpecs, ProcessedData } from './types';
 import { DEFAULT_SPECS, LOGO_URL } from './constants';
-import { ChevronLeft, FileText, Settings, LayoutDashboard, Shield, ClipboardList } from 'lucide-react';
+import { ChevronLeft, FileText, Settings, LayoutDashboard, Shield, ClipboardList, Wrench } from 'lucide-react';
 
-type AppMode = 'home' | 'warranty' | 'report';
+type AppMode = 'home' | 'warranty' | 'report' | 'booking';
 
 const App: React.FC = () => {
   const [mode, setMode] = useState<AppMode>('home');
@@ -119,8 +120,8 @@ const App: React.FC = () => {
               </p>
             </div>
 
-            {/* Two Action Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+            {/* Three Action Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-4">
               {/* Warranty Card */}
               <button
                 onClick={() => setMode('warranty')}
@@ -154,6 +155,26 @@ const App: React.FC = () => {
                   Get report <ChevronLeft className="w-4 h-4 rotate-180" />
                 </div>
               </button>
+
+              {/* Free Checkup Card */}
+              <button
+                onClick={() => setMode('booking')}
+                className="group bg-white rounded-2xl p-8 border-2 border-transparent shadow-[0_4px_20px_rgb(0,0,0,0.05)] hover:shadow-xl hover:border-[#1A1C19] hover:-translate-y-1 transition-all duration-300 text-left relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 p-3 bg-[#78AD3E] text-white text-xs font-bold tracking-wider uppercase rounded-bl-xl shadow-sm">
+                  Free
+                </div>
+                <div className="w-14 h-14 bg-gray-100 group-hover:bg-[#1A1C19] border-2 border-transparent group-hover:border-[#78AD3E] rounded-2xl flex items-center justify-center mb-5 transition-all duration-300">
+                  <Wrench className="w-7 h-7 text-gray-500 group-hover:text-[#78AD3E] transition-colors duration-300" />
+                </div>
+                <h3 className="text-xl font-bold text-[#1A1C19] mb-2 uppercase tracking-tight">Book Checkup</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  Schedule a complimentary diagnostic checkup for your DC Energy inverter and battery units.
+                </p>
+                <div className="mt-5 flex items-center gap-1 text-[#1A1C19] group-hover:text-[#78AD3E] text-sm font-bold uppercase tracking-wider transition-colors">
+                  Request Slot <ChevronLeft className="w-4 h-4 rotate-180" />
+                </div>
+              </button>
             </div>
           </div>
         )}
@@ -168,6 +189,13 @@ const App: React.FC = () => {
                 setStep(1);
               }}
             />
+          </div>
+        )}
+
+        {/* ===== BOOKING MODE ===== */}
+        {mode === 'booking' && (
+          <div className="flex flex-col items-center pt-6 animate-fadeIn">
+            <BookCheckupForm />
           </div>
         )}
 

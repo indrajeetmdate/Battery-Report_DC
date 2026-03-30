@@ -1,0 +1,22 @@
+import { supabase } from './supabaseService';
+
+export interface CheckupBooking {
+  customer_name: string;
+  location_data: string;
+  checkup_date: string;
+  time_slot: 'Morning (10 AM - 2 PM)' | 'Afternoon (2 PM - 6 PM)';
+}
+
+/** Submit a new checkup booking */
+export const bookCheckupSlot = async (bookingData: CheckupBooking): Promise<void> => {
+  const { error } = await supabase.from('checkup_bookings').insert([
+    {
+      customer_name: bookingData.customer_name.trim(),
+      location_data: bookingData.location_data.trim(),
+      checkup_date: bookingData.checkup_date,
+      time_slot: bookingData.time_slot,
+    },
+  ]);
+
+  if (error) throw new Error(error.message);
+};
