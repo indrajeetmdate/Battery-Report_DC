@@ -5,10 +5,17 @@ import { Button } from './Button';
 interface ProductIdInputProps {
   onSearch: (id: string) => void;
   isLoading: boolean;
+  initialValue?: string;
 }
 
-export const ProductIdInput: React.FC<ProductIdInputProps> = ({ onSearch, isLoading }) => {
-  const [productId, setProductId] = useState('');
+export const ProductIdInput: React.FC<ProductIdInputProps> = ({ onSearch, isLoading, initialValue = '' }) => {
+  const [productId, setProductId] = useState(initialValue);
+
+  React.useEffect(() => {
+    if (initialValue) {
+      setProductId(initialValue);
+    }
+  }, [initialValue]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -19,9 +19,9 @@ def check_pdf(serialNumber: str):
     try:
         service = build('drive', 'v3', developerKey=API_KEY)
         
-        # Exact name match, looking for PDF files
-        # We search specifically for the serial number as the exact file name
-        query = f"'{FOLDER_ID}' in parents and name = '{serialNumber}.pdf' and trashed = false and mimeType = 'application/pdf'"
+        # We use 'contains' to ensure we match even if named 'SERIAL.pdf' or 'Report_SERIAL.pdf'
+        # but also filter by application/pdf MIME type
+        query = f"'{FOLDER_ID}' in parents and name contains '{serialNumber}' and mimeType = 'application/pdf' and trashed = false"
         
         results = service.files().list(
             q=query, 
@@ -30,16 +30,6 @@ def check_pdf(serialNumber: str):
         ).execute()
         
         files = results.get('files', [])
-
-        if not files:
-            # Try without .pdf extension just in case
-            query_alt = f"'{FOLDER_ID}' in parents and name = '{serialNumber}' and trashed = false and mimeType = 'application/pdf'"
-            results_alt = service.files().list(
-                q=query_alt, 
-                pageSize=1, 
-                fields="files(id, name, webViewLink)"
-            ).execute()
-            files = results_alt.get('files', [])
 
         if files:
             return {"exists": True, "webViewLink": files[0]['webViewLink'], "name": files[0]['name']}

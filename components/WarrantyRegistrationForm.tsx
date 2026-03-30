@@ -9,7 +9,11 @@ const inputClass =
 
 const labelClass = 'block text-sm font-semibold text-[#41463F] mb-1.5';
 
-export const WarrantyRegistrationForm: React.FC = () => {
+interface WarrantyRegistrationFormProps {
+  onNoReportFound: (serialNumber: string) => void;
+}
+
+export const WarrantyRegistrationForm: React.FC<WarrantyRegistrationFormProps> = ({ onNoReportFound }) => {
   const [formData, setFormData] = useState<WarrantyRegistration>({
     serial_number: '',
     customer_name: '',
@@ -41,10 +45,19 @@ export const WarrantyRegistrationForm: React.FC = () => {
           const result = await response.json();
           if (result.exists) {
             setPdfReportLink({ url: result.webViewLink, name: result.name });
+            return;
           }
         }
+        
+        // If we get here, either response was not ok, or PDF does not exist in Drive
+        onNoReportFound(formData.serial_number);
+        return;
+        
       } catch (pdfErr) {
         console.warn('Failed to check for PDF report:', pdfErr);
+        // Fallback to report generator
+        onNoReportFound(formData.serial_number);
+        return;
       }
     } catch (err: any) {
       if (err.message === 'ALREADY_REGISTERED') {

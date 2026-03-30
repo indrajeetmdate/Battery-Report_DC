@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [specs, setSpecs] = useState<BatterySpecs>(DEFAULT_SPECS);
   const [data, setData] = useState<ProcessedData | null>(null);
+  const [initialSearchTerm, setInitialSearchTerm] = useState('');
 
   const handleProductSearch = async (productId: string) => {
     setLoading(true);
@@ -60,6 +61,7 @@ const App: React.FC = () => {
     setMode('home');
     setStep(1);
     setData(null);
+    setInitialSearchTerm('');
   };
 
   return (
@@ -159,7 +161,13 @@ const App: React.FC = () => {
         {/* ===== WARRANTY MODE ===== */}
         {mode === 'warranty' && (
           <div className="flex flex-col items-center pt-6 animate-fadeIn">
-            <WarrantyRegistrationForm />
+            <WarrantyRegistrationForm 
+              onNoReportFound={(serial) => {
+                setInitialSearchTerm(serial);
+                setMode('report');
+                setStep(1);
+              }}
+            />
           </div>
         )}
 
@@ -175,7 +183,11 @@ const App: React.FC = () => {
                     Enter your Product ID to retrieve official test data and generate your certification report.
                   </p>
                 </div>
-                <ProductIdInput onSearch={handleProductSearch} isLoading={loading} />
+                <ProductIdInput 
+                  initialValue={initialSearchTerm}
+                  onSearch={handleProductSearch} 
+                  isLoading={loading} 
+                />
               </div>
             )}
 
