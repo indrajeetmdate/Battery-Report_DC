@@ -108,10 +108,50 @@ export const BookCheckupForm: React.FC = () => {
     );
   }
 
-  // Get tomorrow's date for the minimum date picker boundary
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split('T')[0];
+  const getBookingWindow = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    
+    const currentMonday = new Date(today);
+    currentMonday.setDate(today.getDate() + diffToMonday);
+    currentMonday.setHours(0, 0, 0, 0);
+
+    const april6 = new Date('2026-04-06T00:00:00');
+    
+    let windowStart: Date;
+    let windowEnd: Date;
+
+    if (currentMonday < april6) {
+      windowStart = new Date(april6);
+      windowEnd = new Date(april6);
+      windowEnd.setDate(april6.getDate() + 13); // 14 days total
+    } else {
+      windowStart = new Date(currentMonday);
+      windowEnd = new Date(currentMonday);
+      windowEnd.setDate(currentMonday.getDate() + 20); // 3 weeks window from current monday
+    }
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const finalMinDate = tomorrow > windowStart ? tomorrow : windowStart;
+    
+    const formatDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    return {
+      minDate: formatDate(finalMinDate),
+      maxDate: formatDate(windowEnd)
+    };
+  };
+
+  const { minDate, maxDate } = getBookingWindow();
 
   return (
     <div className="w-full max-w-2xl mx-auto animate-fadeIn">
@@ -202,6 +242,7 @@ export const BookCheckupForm: React.FC = () => {
                   name="checkup_date"
                   type="date"
                   min={minDate}
+                  max={maxDate}
                   value={formData.checkup_date}
                   onChange={handleChange}
                   required
