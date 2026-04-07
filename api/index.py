@@ -3,6 +3,16 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 import io
 import os
+import urllib.request
+import json
+from pydantic import BaseModel
+
+class BookingNotification(BaseModel):
+    customer_name: str
+    phone_number: str
+    location_data: str
+    checkup_date: str
+    time_slot: str
 
 app = FastAPI()
 
@@ -91,3 +101,28 @@ def fetch_report(productId: str):
         if isinstance(e, HTTPException):
             raise e
         raise HTTPException(status_code=500, detail=f"Failed to retrieve report: {str(e)}")
+
+@app.post("/api/notify-slack")
+def notify_slack(booking: BookingNotification):
+    webhook_url = os.environ.get("SLACK_WEBHOOK_URL")
+    
+    if not webhook_url:
+        print("Warning: SLACK_WEBHOOK_URL is not set.")
+        raise HTTPException(status_code=500, detail="Slack webhook disabled")
+    
+    # Escape some possible markdown issues or just use standard blocks
+    message = {
+        "text": f"🟢 *New Free Checkup Booking!*\n*Name:* {booking.customer_name}\n*Phone:* {booking.phone_number}\n*Date:* {booking.checkup_date}\n*Time Slot:* {booking.time_slot}\n*Location:* {booking.location_data}"
+    }
+    
+    req = urllib.request.Request(webhook_url, data=json.dumps(message).encode('utf-8'), headers={'Content-Type': 'application/json'})
+    
+    try:
+        with urllib.request.urlopen(req) as response:
+            if response.getcode() == 200:
+                return {"status": "success"}
+            else:
+                raise HTTPException(status_code=500, detail="Failed to send Slack notification")
+    except Exception as e:
+        print(f"Slack webhook error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to notify Slack: {str(e)}")

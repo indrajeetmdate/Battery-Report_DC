@@ -21,4 +21,17 @@ export const bookCheckupSlot = async (bookingData: CheckupBooking): Promise<void
   ]);
 
   if (error) throw new Error(error.message);
+
+  // Send Slack Notification via our backend relay
+  try {
+    await fetch('/api/notify-slack', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bookingData),
+    });
+  } catch (err) {
+    console.error("Failed to notify slack:", err);
+  }
 };
