@@ -23,6 +23,13 @@ export const BookCheckupForm: React.FC = () => {
   const [isDetecting, setIsDetecting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.name === 'checkup_date') {
+      const val = e.target.value;
+      if (val === '2026-04-08' || val === '2026-04-09') {
+        alert("Bookings for April 8th and 9th are temporarily unavailable. Please select another date.");
+        return;
+      }
+    }
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -89,17 +96,27 @@ export const BookCheckupForm: React.FC = () => {
     return (
       <div className="w-full max-w-xl mx-auto animate-fadeIn mt-8">
         <div className="border-4 border-[#78AD3E] bg-white p-10 flex flex-col items-center justify-center text-center shadow-[8px_8px_0_0_#78AD3E]">
-          <div className="w-20 h-20 bg-green-50 mb-6 flex items-center justify-center border-2 border-[#78AD3E]">
+          <div className="w-20 h-20 bg-green-50 mb-6 flex items-center justify-center border-2 border-[#78AD3E] rounded-full">
             <CheckCircle className="w-10 h-10 text-[#78AD3E]" />
           </div>
           <h2 className="text-3xl font-black text-[#1A1C19] mb-4 uppercase tracking-tight">Slot Confirmed</h2>
-          <p className="text-gray-600 font-medium mb-8 max-w-sm">
+          <p className="text-gray-600 font-medium mb-6 max-w-sm">
             Your {formData.time_slot} checkup on {formData.checkup_date} has been added to our service queue. 
             Our technician will contact you shortly before arrival.
           </p>
+          
+          <a
+            href="https://wa.me/918956340980"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full px-8 py-4 bg-[#25D366] text-white font-bold uppercase tracking-widest hover:bg-[#128C7E] transition-colors focus:outline-none rounded-full mb-4 flex items-center justify-center"
+          >
+            WHATSAPP US
+          </a>
+
           <button
             onClick={handleReset}
-            className="w-full sm:w-auto px-8 py-4 bg-[#1A1C19] text-white font-bold uppercase tracking-widest hover:bg-[#78AD3E] transition-colors border-2 border-transparent focus:outline-none rounded-full"
+            className="w-full px-8 py-4 bg-[#1A1C19] text-white font-bold uppercase tracking-widest hover:bg-[#78AD3E] transition-colors border-2 border-transparent focus:outline-none rounded-full"
           >
             BOOK ANOTHER SLOT
           </button>
