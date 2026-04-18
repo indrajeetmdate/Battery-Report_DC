@@ -14,6 +14,7 @@ export const AdminDashboard: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [staffCode, setStaffCode] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -58,6 +59,11 @@ export const AdminDashboard: React.FC = () => {
     setErrorMsg('');
     try {
       if (authMode === 'signup') {
+        if (staffCode !== 'internalDCaffairs') {
+          setErrorMsg('Invalid internal access code.');
+          setLoading(false);
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 
@@ -154,6 +160,13 @@ export const AdminDashboard: React.FC = () => {
               <label className={labelClass}>Password</label>
               <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} placeholder="Min 6 characters" />
             </div>
+
+            {authMode === 'signup' && (
+              <div>
+                <label className={labelClass}>Internal Access Code</label>
+                <input type="password" required value={staffCode} onChange={(e) => setStaffCode(e.target.value)} className={inputClass} placeholder="Enter staff code" />
+              </div>
+            )}
 
             <button type="submit" disabled={loading} className="w-full py-4 mt-4 bg-[#1A1C19] text-white font-black text-lg uppercase tracking-widest border-2 border-[#1A1C19] hover:bg-[#78AD3E] hover:border-[#78AD3E] transition-all rounded-full">
               {loading ? 'Processing...' : authMode === 'login' ? 'SIGN IN' : 'CREATE STAFF ACCOUNT'}
