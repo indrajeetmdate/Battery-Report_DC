@@ -5,6 +5,8 @@ import { Dashboard } from './components/Dashboard';
 import { Button } from './components/Button';
 import { WarrantyRegistrationForm } from './components/WarrantyRegistrationForm';
 import { BookCheckupForm } from './components/BookCheckupForm';
+import { PartnerPortal } from './components/PartnerPortal';
+import { AdminDashboard } from './components/AdminDashboard';
 import { parseExcelFile } from './services/excelService';
 import { generatePDF } from './services/pdfService';
 import { BatterySpecs, ProcessedData } from './types';
@@ -101,6 +103,13 @@ const App: React.FC = () => {
               >
                 Free Checkup
               </Link>
+              <Link 
+                to="/partner"
+                onClick={() => setStep(1)}
+                className={`text-sm font-semibold transition-colors ${mode === 'partner' ? 'text-[#78AD3E]' : 'text-gray-500 hover:text-gray-900'}`}
+              >
+                Partner Network
+              </Link>
               <a 
                 href="https://cnergy.co.in/"
                 target="_blank"
@@ -143,6 +152,7 @@ const App: React.FC = () => {
                  <option value="warranty">Warranty Registration</option>
                  <option value="report">Report Generation</option>
                  <option value="booking">Free Checkup</option>
+                 <option value="partner">Partner Network</option>
                  <option value="website">DC Website ↗</option>
                </select>
             </div>
@@ -170,12 +180,12 @@ const App: React.FC = () => {
                 </p>
               </div>
 
-              {/* Single Action Card on Home */}
-              <div className="flex justify-center w-full max-w-lg px-4">
+              {/* Mode Action Cards on Home */}
+              <div className="flex flex-col md:flex-row justify-center w-full max-w-4xl px-4 gap-6">
                 {/* Free Checkup Card */}
                 <button
                   onClick={() => navigate('/booking')}
-                  className="group bg-white rounded-3xl p-8 border-2 border-gray-200 shadow-md hover:shadow-xl hover:border-[#1A1C19] hover:-translate-y-1 transition-all duration-300 text-left relative overflow-hidden"
+                  className="w-full group bg-white rounded-3xl p-8 border-2 border-gray-200 shadow-[8px_8px_0_0_#e5e7eb] hover:shadow-[8px_8px_0_0_#1A1C19] hover:-translate-y-1 hover:border-[#1A1C19] transition-all duration-300 text-left relative overflow-hidden"
                 >
                   <div className="absolute top-0 right-0 p-3 bg-[#78AD3E] text-white text-xs font-bold tracking-wider uppercase rounded-bl-3xl shadow-sm">
                     Free
@@ -183,12 +193,28 @@ const App: React.FC = () => {
                   <div className="w-14 h-14 bg-gray-100 group-hover:bg-[#1A1C19] border-2 border-transparent group-hover:border-[#78AD3E] rounded-full flex items-center justify-center mb-5 transition-all duration-300">
                     <Wrench className="w-7 h-7 text-gray-500 group-hover:text-[#78AD3E] transition-colors duration-300" />
                   </div>
-                  <h3 className="text-xl font-bold text-[#1A1C19] mb-2 uppercase tracking-tight">Book Checkup</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">
+                  <h3 className="text-xl font-black text-[#1A1C19] mb-2 uppercase tracking-tight">Book Checkup</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed font-medium">
                     Schedule a complimentary diagnostic checkup for your DC Energy inverter and battery units.
                   </p>
                   <div className="mt-5 flex items-center gap-1 text-[#1A1C19] group-hover:text-[#78AD3E] text-sm font-bold uppercase tracking-wider transition-colors">
                     Request Slot <ChevronLeft className="w-4 h-4 rotate-180" />
+                  </div>
+                </button>
+
+                {/* Partner Network Card */}
+                <button
+                  onClick={() => navigate('/partner')}
+                  className="w-full group bg-[#1A1C19] rounded-3xl p-8 border-2 border-[#1A1C19] shadow-[8px_8px_0_0_#78AD3E] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_rgba(120,173,62,0.5)] transition-all duration-300 text-left relative overflow-hidden flex flex-col justify-between"
+                >
+                  <div>
+                    <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">Partner<br/><span className="text-[#78AD3E]">Network</span></h3>
+                    <p className="text-gray-400 text-sm leading-relaxed font-medium">
+                      Join our lifetime incentive program. Earn a continuous percentage cut on all lifelong orders from your referred customers.
+                    </p>
+                  </div>
+                  <div className="mt-8 flex items-center gap-1 text-[#78AD3E] group-hover:text-white text-sm font-bold uppercase tracking-wider transition-colors">
+                    Access Portal <ChevronLeft className="w-4 h-4 rotate-180" />
                   </div>
                 </button>
               </div>
@@ -212,6 +238,20 @@ const App: React.FC = () => {
           <Route path="/booking" element={
             <div className="flex flex-col items-center pt-6 animate-fadeIn">
               <BookCheckupForm />
+            </div>
+          } />
+
+          {/* ===== PARTNER MODE ===== */}
+          <Route path="/partner" element={
+            <div className="flex flex-col items-center pt-6 animate-fadeIn">
+              <PartnerPortal />
+            </div>
+          } />
+
+          {/* ===== ADMIN MODE ===== */}
+          <Route path="/admin" element={
+            <div className="flex flex-col items-center pt-6 animate-fadeIn">
+              <AdminDashboard />
             </div>
           } />
 
@@ -299,8 +339,13 @@ const App: React.FC = () => {
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-12">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <p className="mx-auto md:mx-0">&copy; {new Date().getFullYear()} DC Energy. All rights reserved.</p>
+        <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row justify-between items-center text-sm">
+          <p className="text-gray-500 font-medium mb-4 md:mb-0">&copy; {new Date().getFullYear()} DC Energy. All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <Link to="/admin" className="text-gray-400 hover:text-[#1A1C19] font-bold uppercase tracking-wider text-xs transition-colors">
+              Staff Access
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
