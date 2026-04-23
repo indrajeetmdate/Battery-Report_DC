@@ -62,10 +62,12 @@ export const PartnerPortal: React.FC = () => {
 
           if (insertError) {
             console.error('Partner insert error:', insertError);
-            setErrorMsg('Registration saved but profile creation had an issue. Contact support.');
+            setErrorMsg(`Database Error (${insertError.code}): ${insertError.message}. Did you run the SQL script to create the 'partners' table?`);
+            setLoading(false);
+            return;
           }
 
-          // Notify Slack
+          // Notify Slack ONLY if insert succeeded
           try {
             await fetch('/api/notify-partner-slack', {
               method: 'POST',
@@ -77,7 +79,7 @@ export const PartnerPortal: React.FC = () => {
           }
         }
 
-        // Show success regardless — they may need to confirm email
+        // Show success
         setSignupDone(true);
         setLoading(false);
         return;
