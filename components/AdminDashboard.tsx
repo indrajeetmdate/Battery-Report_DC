@@ -9,6 +9,7 @@ export const AdminDashboard: React.FC = () => {
   const [session, setSession] = useState<any>(null);
   const [isStaff, setIsStaff] = useState(false);
   const [partners, setPartners] = useState<any[]>([]);
+  const [claims, setClaims] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
@@ -42,13 +43,12 @@ export const AdminDashboard: React.FC = () => {
     if (error) {
       console.error('Staff check error:', error);
       setIsStaff(false);
-      // Give a helpful alert if the table is completely missing
       if (error.code === '42P01') {
          alert("CRITICAL: The 'staff_users' table does not exist in your Supabase database. You must run the SQL script.");
       }
     } else if (data) {
       setIsStaff(true);
-      await fetchPartners();
+      await Promise.all([fetchPartners(), fetchClaims()]);
     }
     setLoading(false);
   };
@@ -56,6 +56,11 @@ export const AdminDashboard: React.FC = () => {
   const fetchPartners = async () => {
     const { data, error } = await supabase.from('partners').select('*').order('created_at', { ascending: false });
     if (!error && data) setPartners(data);
+  };
+
+  const fetchClaims = async () => {
+    const { data, error } = await supabase.from('partner_claims').select('*, partners(business_name, partner_code)').order('created_at', { ascending: false });
+    if (!error && data) setClaims(data);
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -119,11 +124,24 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleApproveClaim = async (id: string) => {
+    const { error } = await supabase.from('partner_claims').update({ status: 'approved' }).eq('id', id);
+    if (error) alert('Error approving claim: ' + error.message);
+    else fetchClaims();
+  };
+
+  const handleRejectClaim = async (id: string) => {
+    const { error } = await supabase.from('partner_claims').update({ status: 'rejected' }).eq('id', id);
+    if (error) alert('Error rejecting claim: ' + error.message);
+    else fetchClaims();
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setSession(null);
     setIsStaff(false);
     setPartners([]);
+    setClaims([]);
   };
 
   if (loading) {
@@ -277,6 +295,57 @@ export const AdminDashboard: React.FC = () => {
                   <td colSpan={5} className="p-10 text-center text-gray-400 font-bold uppercase tracking-wider">No partner applications yet.</td>
                 </tr>
               )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Partner Claims Table */}
+      <h3 className="text-2xl font-black uppercase text-[#1A1C19] mt-12 mb-6">Partner Claims <span className="text-[#78AD3E]">Review</span></h3>
+      <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl overflow-hidden mb-12">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50 border-b-2 border-gray-200 uppercase text-xs font-black tracking-wider text-gray-600">
+                <th className="p-5">Partner / Business</th>
+                <th className="p-5">Partner Code</th>
+                <th className="p-5">Invoice Number</th>
+                <th className="p-5">Date</th>
+                <th className="p-5">Status</th>
+                <th className="p-5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {claims.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="p-10 text-center text-gray-400 font-bold uppercase tracking-wider">No claims submitted yet.</td>
+                </tr>
+              )}
+              {claims.map((c) => (
+                <tr key={c.id} className="border-b last:border-0 border-gray-100 hover:bg-gray-50 transition-colors">
+                  <td className="p-5 font-bold text-[#1A1C19]">{c.partners?.business_name || 'Unknown'}</td>
+                  <td className="p-5 font-mono font-bold text-gray-600">{c.partners?.partner_code || '—'}</td>
+                  <td className="p-5 font-bold text-[#78AD3E]">{c.invoice_number}</td>
+                  <td className="p-5 text-gray-600 text-sm">{new Date(c.created_at).toLocaleDateString()}</td>
+                  <td className="p-5">
+                    {c.status === 'pending' && <span className="inline-flex items-center gap-1 text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><Clock className="w-3 h-3" /> Pending</span>}
+                    {c.status === 'approved' && <span className="inline-flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><CheckCircle className="w-3 h-3" /> Approved</span>}
+                    {c.status === 'rejected' && <span className="inline-flex items-center gap-1 text-red-600 bg-red-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><XCircle className="w-3 h-3" /> Rejected</span>}
+                  </td>
+                  <td className="p-5 text-right space-x-2">
+                    {c.status === 'pending' && (
+                      <>
+                        <button onClick={() => handleApproveClaim(c.id)} className="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border-2 border-green-200 rounded-full transition-colors" title="Approve">
+                          <ShieldCheck className="w-5 h-5" />
+                        </button>
+                        <button onClick={() => handleRejectClaim(c.id)} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border-2 border-red-200 rounded-full transition-colors" title="Reject">
+                          <XCircle className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

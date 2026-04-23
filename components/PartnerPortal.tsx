@@ -16,6 +16,9 @@ export const PartnerPortal: React.FC = () => {
   const [partnerRecord, setPartnerRecord] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [signupDone, setSignupDone] = useState(false);
+  const [claims, setClaims] = useState<any[]>([]);
+  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [claimLoading, setClaimLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -38,8 +41,35 @@ export const PartnerPortal: React.FC = () => {
     const { data, error } = await supabase.from('partners').select('*').eq('id', userId).single();
     if (!error && data) {
       setPartnerRecord(data);
+      fetchClaims(data.id);
+    } else {
+      setLoading(false);
+    }
+  };
+
+  const fetchClaims = async (partnerId: string) => {
+    const { data, error } = await supabase.from('partner_claims').select('*').eq('partner_id', partnerId).order('created_at', { ascending: false });
+    if (!error && data) {
+      setClaims(data);
     }
     setLoading(false);
+  };
+
+  const submitClaim = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!invoiceNumber.trim() || !partnerRecord) return;
+    setClaimLoading(true);
+    const { error } = await supabase.from('partner_claims').insert([{
+      partner_id: partnerRecord.id,
+      invoice_number: invoiceNumber
+    }]);
+    if (error) {
+      alert('Error submitting claim: ' + error.message);
+    } else {
+      setInvoiceNumber('');
+      fetchClaims(partnerRecord.id);
+    }
+    setClaimLoading(false);
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -212,22 +242,67 @@ export const PartnerPortal: React.FC = () => {
           <p className="text-gray-700 font-medium max-w-md">Your partner application is currently pending verification by the DC Energy administration team. You will be notified once activated.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl p-8">
-            <UserCheck className="w-8 h-8 text-[#78AD3E] mb-4" />
-            <h3 className="text-xl font-black uppercase mb-4">Your Partner Code</h3>
-            <div className="inline-block bg-[#1A1C19] text-white px-6 py-3 rounded-full text-2xl font-mono font-bold tracking-widest">
-              {partnerRecord.partner_code || 'PENDING'}
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl p-8">
+              <UserCheck className="w-8 h-8 text-[#78AD3E] mb-4" />
+              <h3 className="text-xl font-black uppercase mb-4">Your Partner Code</h3>
+              <div className="inline-block bg-[#1A1C19] text-white px-6 py-3 rounded-full text-2xl font-mono font-bold tracking-widest">
+                {partnerRecord.partner_code || 'PENDING'}
+              </div>
+              <p className="text-sm text-gray-500 font-medium mt-4">Keep this code safe for future automatic warranty pairing.</p>
             </div>
-            <p className="text-sm text-gray-500 font-medium mt-4">Share this code with your customers. They enter it during warranty registration to lock in your lifetime incentives.</p>
+
+            <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl p-8">
+              <h3 className="text-xl font-black uppercase mb-4">Submit Manual Claim</h3>
+              <p className="text-sm text-gray-500 mb-6 font-medium">Enter the invoice number for a recent customer sale to claim your incentive.</p>
+              <form onSubmit={submitClaim} className="flex flex-col gap-4">
+                <input 
+                  type="text" 
+                  required 
+                  value={invoiceNumber} 
+                  onChange={(e) => setInvoiceNumber(e.target.value)} 
+                  className={inputClass} 
+                  placeholder="Invoice Number (e.g., INV-001)" 
+                />
+                <button type="submit" disabled={claimLoading} className="w-full py-3.5 bg-gray-100 border-2 border-dashed border-gray-300 hover:border-[#78AD3E] hover:bg-green-50 rounded-full font-bold uppercase text-gray-600 hover:text-[#78AD3E] transition-all">
+                  {claimLoading ? 'Submitting...' : '+ File New Claim'}
+                </button>
+              </form>
+            </div>
           </div>
 
           <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl p-8">
-            <h3 className="text-xl font-black uppercase mb-4">Manual Claim</h3>
-            <p className="text-sm text-gray-500 mb-6 font-medium">If a customer forgot to enter your code, you can manually submit their details for verification.</p>
-            <button className="w-full py-4 bg-gray-100 border-2 border-dashed border-gray-300 hover:border-[#78AD3E] hover:bg-green-50 rounded-full font-bold uppercase text-gray-600 hover:text-[#78AD3E] transition-all">
-              + File New Claim
-            </button>
+            <h3 className="text-xl font-black uppercase mb-6">Your Submitted Claims</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 border-b-2 border-gray-200 uppercase text-xs font-black tracking-wider text-gray-600">
+                    <th className="p-4">Invoice Number</th>
+                    <th className="p-4">Date</th>
+                    <th className="p-4 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {claims.length === 0 && (
+                    <tr>
+                      <td colSpan={3} className="p-8 text-center text-gray-400 font-bold uppercase">No claims submitted yet.</td>
+                    </tr>
+                  )}
+                  {claims.map((claim) => (
+                    <tr key={claim.id} className="border-b last:border-0 border-gray-100">
+                      <td className="p-4 font-bold text-[#1A1C19]">{claim.invoice_number}</td>
+                      <td className="p-4 text-gray-600 text-sm">{new Date(claim.created_at).toLocaleDateString()}</td>
+                      <td className="p-4 text-right">
+                        {claim.status === 'pending' && <span className="inline-block text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full text-xs font-bold uppercase">Pending</span>}
+                        {claim.status === 'approved' && <span className="inline-block text-green-600 bg-green-100 px-3 py-1 rounded-full text-xs font-bold uppercase">Approved</span>}
+                        {claim.status === 'rejected' && <span className="inline-block text-red-600 bg-red-100 px-3 py-1 rounded-full text-xs font-bold uppercase">Rejected</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
