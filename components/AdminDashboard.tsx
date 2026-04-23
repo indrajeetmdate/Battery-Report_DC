@@ -39,11 +39,16 @@ export const AdminDashboard: React.FC = () => {
 
   const checkStaffAndLoad = async (userId: string) => {
     const { data, error } = await supabase.from('staff_users').select('id').eq('id', userId).single();
-    if (!error && data) {
+    if (error) {
+      console.error('Staff check error:', error);
+      setIsStaff(false);
+      // Give a helpful alert if the table is completely missing
+      if (error.code === '42P01') {
+         alert("CRITICAL: The 'staff_users' table does not exist in your Supabase database. You must run the SQL script.");
+      }
+    } else if (data) {
       setIsStaff(true);
       await fetchPartners();
-    } else {
-      setIsStaff(false);
     }
     setLoading(false);
   };
@@ -75,7 +80,7 @@ export const AdminDashboard: React.FC = () => {
           }]);
           if (insertError) {
             console.error('Staff insert error:', insertError);
-            setErrorMsg('Account created but staff profile failed. You may need to confirm your email first, then sign in.');
+            setErrorMsg(`Database Error (${insertError.code}): ${insertError.message}. Did you run the SQL script to create the staff_users table?`);
             setLoading(false);
             return;
           }
