@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseService';
-import { ShieldCheck, XCircle, CheckCircle, Clock, Lock } from 'lucide-react';
+import { ShieldCheck, XCircle, CheckCircle, Clock, Lock, ChevronDown, ChevronRight, FileText } from 'lucide-react';
 
 const inputClass = 'w-full px-6 py-3.5 bg-gray-50 border-2 border-gray-200 focus:outline-none focus:border-[#78AD3E] text-[#1A1C19] font-medium transition-colors placeholder-gray-400 font-sans rounded-full';
 const labelClass = 'block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 ml-4';
@@ -16,6 +16,11 @@ export const AdminDashboard: React.FC = () => {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [staffCode, setStaffCode] = useState('');
+  const [expandedPartners, setExpandedPartners] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = (id: string) => {
+    setExpandedPartners(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -253,7 +258,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Partners Table */}
-      <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl overflow-hidden">
+      <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl overflow-hidden mb-12">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -266,86 +271,102 @@ export const AdminDashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {partners.map((p) => (
-                <tr key={p.id} className="border-b last:border-0 border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="p-5 font-bold text-[#1A1C19]">{p.business_name || 'N/A'}</td>
-                  <td className="p-5 text-gray-600 font-medium">{p.phone_number || 'N/A'}</td>
-                  <td className="p-5">
-                    {p.status === 'pending' && <span className="inline-flex items-center gap-1 text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><Clock className="w-3 h-3" /> Pending</span>}
-                    {p.status === 'active' && <span className="inline-flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><CheckCircle className="w-3 h-3" /> Active</span>}
-                    {p.status === 'rejected' && <span className="inline-flex items-center gap-1 text-red-600 bg-red-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><XCircle className="w-3 h-3" /> Rejected</span>}
-                  </td>
-                  <td className="p-5 font-mono font-bold text-gray-600">{p.partner_code || '—'}</td>
-                  <td className="p-5 text-right space-x-2">
-                    {p.status === 'pending' && (
-                      <>
-                        <button onClick={() => handleApprove(p.id)} className="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border-2 border-green-200 rounded-full transition-colors" title="Approve">
-                          <ShieldCheck className="w-5 h-5" />
-                        </button>
-                        <button onClick={() => handleReject(p.id)} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border-2 border-red-200 rounded-full transition-colors" title="Reject">
-                          <XCircle className="w-5 h-5" />
-                        </button>
-                      </>
+              {partners.map((p) => {
+                const partnerClaims = claims.filter(c => c.partner_id === p.id);
+                const pendingClaims = partnerClaims.filter(c => c.status === 'pending').length;
+                const isExpanded = expandedPartners[p.id];
+
+                return (
+                  <React.Fragment key={p.id}>
+                    <tr 
+                      className="border-b last:border-0 border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => toggleExpand(p.id)}
+                    >
+                      <td className="p-5 font-bold text-[#1A1C19] flex items-center gap-3">
+                        {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
+                        {p.business_name || 'N/A'}
+                        {pendingClaims > 0 && (
+                          <span className="ml-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{pendingClaims} NEW</span>
+                        )}
+                      </td>
+                      <td className="p-5 text-gray-600 font-medium">{p.phone_number || 'N/A'}</td>
+                      <td className="p-5">
+                        {p.status === 'pending' && <span className="inline-flex items-center gap-1 text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><Clock className="w-3 h-3" /> Pending</span>}
+                        {p.status === 'active' && <span className="inline-flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><CheckCircle className="w-3 h-3" /> Active</span>}
+                        {p.status === 'rejected' && <span className="inline-flex items-center gap-1 text-red-600 bg-red-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><XCircle className="w-3 h-3" /> Rejected</span>}
+                      </td>
+                      <td className="p-5 font-mono font-bold text-gray-600">{p.partner_code || '—'}</td>
+                      <td className="p-5 text-right space-x-2" onClick={(e) => e.stopPropagation()}>
+                        {p.status === 'pending' && (
+                          <>
+                            <button onClick={() => handleApprove(p.id)} className="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border-2 border-green-200 rounded-full transition-colors" title="Approve">
+                              <ShieldCheck className="w-5 h-5" />
+                            </button>
+                            <button onClick={() => handleReject(p.id)} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border-2 border-red-200 rounded-full transition-colors" title="Reject">
+                              <XCircle className="w-5 h-5" />
+                            </button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                    
+                    {isExpanded && (
+                      <tr className="bg-gray-50 border-b-2 border-gray-200 shadow-inner">
+                        <td colSpan={5} className="p-0">
+                          <div className="p-6 pl-12 bg-gray-50 border-l-4 border-[#78AD3E]">
+                            <h4 className="text-sm font-black uppercase text-gray-600 mb-4 flex items-center gap-2">
+                              <FileText className="w-4 h-4"/> Invoice Claims for {p.business_name}
+                            </h4>
+                            
+                            {partnerClaims.length === 0 ? (
+                              <p className="text-sm text-gray-400 font-medium italic mb-2">No invoice claims submitted by this partner yet.</p>
+                            ) : (
+                              <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+                                <table className="w-full text-left">
+                                  <thead>
+                                    <tr className="bg-gray-100 text-[10px] font-black uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                                      <th className="p-3">Invoice Number</th>
+                                      <th className="p-3">Date</th>
+                                      <th className="p-3">Status</th>
+                                      <th className="p-3 text-right">Action</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {partnerClaims.map(c => (
+                                      <tr key={c.id} className="border-b last:border-0 border-gray-100">
+                                        <td className="p-3 font-bold text-[#78AD3E]">{c.invoice_number}</td>
+                                        <td className="p-3 text-gray-500 text-sm font-medium">{new Date(c.created_at).toLocaleDateString()}</td>
+                                        <td className="p-3">
+                                          {c.status === 'pending' && <span className="inline-flex items-center gap-1 text-yellow-600 text-xs font-bold uppercase"><Clock className="w-3 h-3" /> Pending</span>}
+                                          {c.status === 'approved' && <span className="inline-flex items-center gap-1 text-green-600 text-xs font-bold uppercase"><CheckCircle className="w-3 h-3" /> Approved</span>}
+                                          {c.status === 'rejected' && <span className="inline-flex items-center gap-1 text-red-600 text-xs font-bold uppercase"><XCircle className="w-3 h-3" /> Rejected</span>}
+                                        </td>
+                                        <td className="p-3 text-right space-x-2">
+                                          {c.status === 'pending' && (
+                                            <>
+                                              <button onClick={() => handleApproveClaim(c.id)} className="px-3 py-1 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-200 rounded-full text-xs font-bold uppercase transition-colors">Approve</button>
+                                              <button onClick={() => handleRejectClaim(c.id)} className="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-200 rounded-full text-xs font-bold uppercase transition-colors">Reject</button>
+                                            </>
+                                          )}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                </tr>
-              ))}
+                  </React.Fragment>
+                );
+              })}
               {partners.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-10 text-center text-gray-400 font-bold uppercase tracking-wider">No partner applications yet.</td>
                 </tr>
               )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Partner Claims Table */}
-      <h3 className="text-2xl font-black uppercase text-[#1A1C19] mt-12 mb-6">Partner Claims <span className="text-[#78AD3E]">Review</span></h3>
-      <div className="bg-white border-2 border-gray-200 shadow-[8px_8px_0_0_#1A1C19] rounded-3xl overflow-hidden mb-12">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50 border-b-2 border-gray-200 uppercase text-xs font-black tracking-wider text-gray-600">
-                <th className="p-5">Partner / Business</th>
-                <th className="p-5">Partner Code</th>
-                <th className="p-5">Invoice Number</th>
-                <th className="p-5">Date</th>
-                <th className="p-5">Status</th>
-                <th className="p-5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {claims.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="p-10 text-center text-gray-400 font-bold uppercase tracking-wider">No claims submitted yet.</td>
-                </tr>
-              )}
-              {claims.map((c) => (
-                <tr key={c.id} className="border-b last:border-0 border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="p-5 font-bold text-[#1A1C19]">{c.partners?.business_name || 'Unknown'}</td>
-                  <td className="p-5 font-mono font-bold text-gray-600">{c.partners?.partner_code || '—'}</td>
-                  <td className="p-5 font-bold text-[#78AD3E]">{c.invoice_number}</td>
-                  <td className="p-5 text-gray-600 text-sm">{new Date(c.created_at).toLocaleDateString()}</td>
-                  <td className="p-5">
-                    {c.status === 'pending' && <span className="inline-flex items-center gap-1 text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><Clock className="w-3 h-3" /> Pending</span>}
-                    {c.status === 'approved' && <span className="inline-flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><CheckCircle className="w-3 h-3" /> Approved</span>}
-                    {c.status === 'rejected' && <span className="inline-flex items-center gap-1 text-red-600 bg-red-100 px-3 py-1 rounded-full text-xs font-bold uppercase"><XCircle className="w-3 h-3" /> Rejected</span>}
-                  </td>
-                  <td className="p-5 text-right space-x-2">
-                    {c.status === 'pending' && (
-                      <>
-                        <button onClick={() => handleApproveClaim(c.id)} className="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border-2 border-green-200 rounded-full transition-colors" title="Approve">
-                          <ShieldCheck className="w-5 h-5" />
-                        </button>
-                        <button onClick={() => handleRejectClaim(c.id)} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border-2 border-red-200 rounded-full transition-colors" title="Reject">
-                          <XCircle className="w-5 h-5" />
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
             </tbody>
           </table>
         </div>
