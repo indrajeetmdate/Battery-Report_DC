@@ -224,13 +224,7 @@ const App: React.FC = () => {
           {/* ===== WARRANTY MODE ===== */}
           <Route path="/warranty" element={
             <div className="flex flex-col items-center pt-6 animate-fadeIn">
-              <WarrantyRegistrationForm 
-                onNoReportFound={(serial) => {
-                  setInitialSearchTerm(serial);
-                  navigate('/report');
-                  setStep(1);
-                }}
-              />
+              <WarrantyRegistrationForm />
             </div>
           } />
 
