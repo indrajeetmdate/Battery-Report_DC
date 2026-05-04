@@ -214,3 +214,65 @@ def send_warranty_email(data: WarrantyEmail):
     except Exception as e:
         print(f"Email send error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to send confirmation email: {str(e)}")
+
+
+class BookingEmail(BaseModel):
+    customer_name: str
+    customer_email: str
+    checkup_date: str
+    time_slot: str
+
+@app.post("/api/send-booking-email")
+def send_booking_email(data: BookingEmail):
+    gmail_user = "datlioncnergy@gmail.com"
+    gmail_password = os.environ.get("GMAIL_APP_PASSWORD")
+
+    if not gmail_password:
+        print("Warning: GMAIL_APP_PASSWORD is not set.")
+        raise HTTPException(status_code=500, detail="Email service not configured")
+
+    html_body = f"""
+    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
+      <div style="background: #1A1C19; padding: 32px 24px; text-align: center;">
+        <h1 style="color: #78AD3E; margin: 0; font-size: 28px; letter-spacing: 2px;">DC ENERGY</h1>
+        <p style="color: #ffffff; margin: 8px 0 0; font-size: 12px; letter-spacing: 4px; text-transform: uppercase;">Checkup Booking Confirmed</p>
+      </div>
+      <div style="padding: 32px 24px;">
+        <p style="color: #1A1C19; font-size: 16px; margin: 0 0 16px;">Dear <strong>{data.customer_name}</strong>,</p>
+        <p style="color: #555; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+          Your request for a free technical checkup has been successfully added to our service queue. 
+        </p>
+        <div style="background: #f0fbe4; border: 2px solid #78AD3E; border-radius: 16px; padding: 20px; margin: 0 0 24px;">
+          <p style="color: #1A1C19; font-weight: bold; margin: 0 0 8px; font-size: 14px;">📅 BOOKING DETAILS</p>
+          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;">
+            <strong>Date:</strong> {data.checkup_date}<br/>
+            <strong>Time Slot:</strong> {data.time_slot}
+          </p>
+        </div>
+        <p style="color: #555; font-size: 14px; line-height: 1.6; margin: 0 0 24px;">
+          Our technician will contact you shortly before arrival. If you need to reschedule, please reply to this email or reach out to us at <a href="mailto:datlioncnergy@gmail.com" style="color: #78AD3E; font-weight: bold;">datlioncnergy@gmail.com</a>.
+        </p>
+        <p style="color: #1A1C19; font-size: 14px; margin: 0;">
+          Warm regards,<br/><strong>DC Energy Team</strong>
+        </p>
+      </div>
+      <div style="background: #f5f5f5; padding: 16px 24px; text-align: center; border-top: 1px solid #e0e0e0;">
+        <p style="color: #999; font-size: 11px; margin: 0;">© 2025 DC Energy. All rights reserved.</p>
+      </div>
+    </div>
+    """
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = "DC Energy — Checkup Booking Confirmed ✅"
+    msg["From"] = gmail_user
+    msg["To"] = data.customer_email
+    msg.attach(MIMEText(html_body, "html"))
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(gmail_user, gmail_password)
+            server.sendmail(gmail_user, data.customer_email, msg.as_string())
+        return {"status": "success"}
+    except Exception as e:
+        print(f"Email send error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to send booking confirmation email: {str(e)}")

@@ -3,6 +3,7 @@ import { supabase } from './supabaseService';
 export interface CheckupBooking {
   customer_name: string;
   phone_number: string;
+  email: string;
   location_data: string;
   checkup_date: string;
   time_slot: 'Morning (10 AM - 2 PM)' | 'Afternoon (2 PM - 6 PM)';
@@ -14,6 +15,7 @@ export const bookCheckupSlot = async (bookingData: CheckupBooking): Promise<void
     {
       customer_name: bookingData.customer_name.trim(),
       phone_number: bookingData.phone_number.trim(),
+      email: bookingData.email.trim(),
       location_data: bookingData.location_data.trim(),
       checkup_date: bookingData.checkup_date,
       time_slot: bookingData.time_slot,
@@ -33,5 +35,23 @@ export const bookCheckupSlot = async (bookingData: CheckupBooking): Promise<void
     });
   } catch (err) {
     console.error("Failed to notify slack:", err);
+  }
+
+  // Send Email Notification via our backend relay
+  try {
+    await fetch('/api/send-booking-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        customer_name: bookingData.customer_name.trim(),
+        customer_email: bookingData.email.trim(),
+        checkup_date: bookingData.checkup_date,
+        time_slot: bookingData.time_slot,
+      }),
+    });
+  } catch (err) {
+    console.error("Failed to send booking email:", err);
   }
 };

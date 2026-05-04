@@ -13,6 +13,7 @@ export const BookCheckupForm: React.FC = () => {
   const [formData, setFormData] = useState<CheckupBooking>({
     customer_name: '',
     phone_number: '',
+    email: '',
     location_data: '',
     checkup_date: '',
     time_slot: 'Morning (10 AM - 2 PM)',
@@ -88,7 +89,7 @@ export const BookCheckupForm: React.FC = () => {
   };
 
   const handleReset = () => {
-    setFormData({ customer_name: '', phone_number: '', location_data: '', checkup_date: '', time_slot: 'Morning (10 AM - 2 PM)' });
+    setFormData({ customer_name: '', phone_number: '', email: '', location_data: '', checkup_date: '', time_slot: 'Morning (10 AM - 2 PM)' });
     setFormState('idle');
   };
 
@@ -212,6 +213,21 @@ export const BookCheckupForm: React.FC = () => {
                 type="tel"
                 placeholder="+91 XXXXX XXXXX"
                 value={formData.phone_number}
+                onChange={handleChange}
+                required
+                className={inputClass}
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className={labelClass} htmlFor="email">Email Address</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                value={formData.email}
                 onChange={handleChange}
                 required
                 className={inputClass}
